@@ -1,0 +1,1414 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "MMD IoT sensors",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a0bf0c5cf929e598",
+        "type": "mqtt-broker",
+        "name": "Gateway 1",
+        "broker": "172.17.0.1",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "799e334559d78ed2",
+        "type": "mqtt-broker",
+        "name": "Gateway 2",
+        "broker": "172.17.0.1",
+        "port": "1884",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "5",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3cc11d24.ff01a2",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "WARNING: please check you have started this container with a volume that is mounted to /data\\n otherwise any flow changes are lost when you redeploy or upgrade the container\\n (e.g. upgrade to a more recent node-red docker image).\\n  If you are using named volumes you can ignore this warning.\\n Double click or see info side panel to learn how to start Node-RED in Docker to save your work",
+        "info": "\nTo start docker with a bind mount volume (-v option), for example:\n\n```\ndocker run -it -p 1880:1880 -v /home/user/node_red_data:/data --name mynodered nodered/node-red\n```\n\nwhere `/home/user/node_red_data` is a directory on your host machine where you want to store your flows.\n\nIf you do not do this then you can experiment and redploy flows, but if you restart or upgrade the container the flows will be disconnected and lost. \n\nThey will still exist in a hidden data volume, which can be recovered using standard docker techniques, but that is much more complex than just starting with a named volume as described above.",
+        "x": 450,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "cdda2d68800b0ca8",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "temperature",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 990,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "e88c46172e201020",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Producer - Temperature",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 15 40}}\",\n    \"id\": \"Producer\"\n}",
+        "x": 670,
+        "y": 1200,
+        "wires": [
+            [
+                "e3a7d11dce6a7bf7"
+            ]
+        ]
+    },
+    {
+        "id": "b5335241329f7a5f",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Temperature",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 670,
+        "y": 340,
+        "wires": [
+            [
+                "cdda2d68800b0ca8"
+            ]
+        ]
+    },
+    {
+        "id": "26759d731b4f7963",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - Temperature",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 690,
+        "y": 840,
+        "wires": [
+            [
+                "cdda2d68800b0ca8"
+            ]
+        ]
+    },
+    {
+        "id": "b2b9f7655c967022",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "temperature",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1290,
+        "y": 340,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "bdad0fe33b02a10a",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Subscribe G1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "502bf260c9919a62",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Producer Temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 1200,
+        "wires": [
+            [
+                "e88c46172e201020"
+            ]
+        ]
+    },
+    {
+        "id": "d67e9937b72ff221",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 340,
+        "wires": [
+            [
+                "b5335241329f7a5f"
+            ]
+        ]
+    },
+    {
+        "id": "ae426d277e33c77d",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor Temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 270,
+        "y": 840,
+        "wires": [
+            [
+                "26759d731b4f7963"
+            ]
+        ]
+    },
+    {
+        "id": "9439b6d12bb71911",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "humidity",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 1000,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "998fdee712e21de4",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Producer - Humidity",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Producer\"\n}",
+        "x": 660,
+        "y": 1240,
+        "wires": [
+            [
+                "7721402ec7ea0eff"
+            ]
+        ]
+    },
+    {
+        "id": "9978b838fd9a5cfb",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Humidity",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 660,
+        "y": 380,
+        "wires": [
+            [
+                "9439b6d12bb71911"
+            ]
+        ]
+    },
+    {
+        "id": "f3e607583897a7ce",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - Humidity",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 680,
+        "y": 800,
+        "wires": [
+            [
+                "9439b6d12bb71911"
+            ]
+        ]
+    },
+    {
+        "id": "2cad64c11997d210",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Producer Humidity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 1240,
+        "wires": [
+            [
+                "998fdee712e21de4"
+            ]
+        ]
+    },
+    {
+        "id": "e7e4e9163eecdc7e",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Humidity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 380,
+        "wires": [
+            [
+                "9978b838fd9a5cfb"
+            ]
+        ]
+    },
+    {
+        "id": "9ed00ba516974f15",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor Humidity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 280,
+        "y": 800,
+        "wires": [
+            [
+                "f3e607583897a7ce"
+            ]
+        ]
+    },
+    {
+        "id": "10e3deccc956a43b",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "humidity",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1280,
+        "y": 400,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "4c785a5873efc840",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "light",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 1010,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "3a87926a42b9bff2",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Producer - Light",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Producer\"\n}",
+        "x": 640,
+        "y": 1280,
+        "wires": [
+            [
+                "c60922c2155f287b"
+            ]
+        ]
+    },
+    {
+        "id": "96f59174dfa8b664",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Light",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 650,
+        "y": 420,
+        "wires": [
+            [
+                "4c785a5873efc840"
+            ]
+        ]
+    },
+    {
+        "id": "8b50bcc93492cc48",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - Light",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 670,
+        "y": 760,
+        "wires": [
+            [
+                "4c785a5873efc840"
+            ]
+        ]
+    },
+    {
+        "id": "861a896c45eeaaf9",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Producer Light",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 310,
+        "y": 1280,
+        "wires": [
+            [
+                "3a87926a42b9bff2"
+            ]
+        ]
+    },
+    {
+        "id": "c08cce28cb3c4fb2",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Light",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 310,
+        "y": 420,
+        "wires": [
+            [
+                "96f59174dfa8b664"
+            ]
+        ]
+    },
+    {
+        "id": "dc3d7b78b5890fb8",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor Light",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 290,
+        "y": 760,
+        "wires": [
+            [
+                "8b50bcc93492cc48"
+            ]
+        ]
+    },
+    {
+        "id": "feac06cec3d087fa",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "light",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 460,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "f86a96b23a646eb7",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "weight",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 1010,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "d6c47c3c8c1525fc",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Producer - Weight",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Producer\"\n}",
+        "x": 650,
+        "y": 1320,
+        "wires": [
+            [
+                "5adabd09907985d2"
+            ]
+        ]
+    },
+    {
+        "id": "557e769edb3cce78",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Weight",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 660,
+        "y": 460,
+        "wires": [
+            [
+                "f86a96b23a646eb7"
+            ]
+        ]
+    },
+    {
+        "id": "88f57d57d2e5bb4e",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - Weight",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 670,
+        "y": 720,
+        "wires": [
+            [
+                "f86a96b23a646eb7"
+            ]
+        ]
+    },
+    {
+        "id": "6b2cf5ce5389cf1c",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Producer Weight",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 310,
+        "y": 1320,
+        "wires": [
+            [
+                "d6c47c3c8c1525fc"
+            ]
+        ]
+    },
+    {
+        "id": "ab144c27c5fa19d3",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Weight",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 300,
+        "y": 460,
+        "wires": [
+            [
+                "557e769edb3cce78"
+            ]
+        ]
+    },
+    {
+        "id": "292b15b437d56ee9",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor Light",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "x": 290,
+        "y": 720,
+        "wires": [
+            [
+                "88f57d57d2e5bb4e"
+            ]
+        ]
+    },
+    {
+        "id": "7c124df28c83915f",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "weight",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 520,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "9df7783812a0d334",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Impact",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 660,
+        "y": 500,
+        "wires": [
+            [
+                "40817c1a1dc22347"
+            ]
+        ]
+    },
+    {
+        "id": "202d0ae5c93b1074",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Impact",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "x": 300,
+        "y": 500,
+        "wires": [
+            [
+                "9df7783812a0d334"
+            ]
+        ]
+    },
+    {
+        "id": "40817c1a1dc22347",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "impact",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 1010,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "ecadd3823c6fa43a",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "impact",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 580,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "019051a71de3b7c8",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Transporter - Open Door",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Transporter\"\n}",
+        "x": 670,
+        "y": 540,
+        "wires": [
+            [
+                "0f7c574c5772321c"
+            ]
+        ]
+    },
+    {
+        "id": "1ad293891978cdbd",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Transporter Open Door",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "x": 290,
+        "y": 540,
+        "wires": [
+            [
+                "019051a71de3b7c8"
+            ]
+        ]
+    },
+    {
+        "id": "0f7c574c5772321c",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "open-door",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 990,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "6b9a8da15fc8103c",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "open-door",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1280,
+        "y": 640,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "1c9c43afabe3e187",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - Open Door",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 680,
+        "y": 880,
+        "wires": [
+            [
+                "0f7c574c5772321c"
+            ]
+        ]
+    },
+    {
+        "id": "b36d033362d5eb98",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor Open Door",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "x": 270,
+        "y": 880,
+        "wires": [
+            [
+                "1c9c43afabe3e187"
+            ]
+        ]
+    },
+    {
+        "id": "eb5b3c69b3f42a7c",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Food Processor - PH",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"id\": \"Food Processor\"\n}",
+        "x": 660,
+        "y": 920,
+        "wires": [
+            [
+                "62fbfb9bf9b6912a"
+            ]
+        ]
+    },
+    {
+        "id": "589cfb27c09b9513",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Food Processor PH",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "",
+        "x": 300,
+        "y": 920,
+        "wires": [
+            [
+                "eb5b3c69b3f42a7c"
+            ]
+        ]
+    },
+    {
+        "id": "293f6f377caf4cdb",
+        "type": "data-generator",
+        "z": "f6f2187d.f17ca8",
+        "name": "Producer - PH",
+        "field": "payload",
+        "fieldType": "msg",
+        "syntax": "text",
+        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"id\": \"Producer\"\n}",
+        "x": 640,
+        "y": 1360,
+        "wires": [
+            [
+                "6ecd6a0b64a10676"
+            ]
+        ]
+    },
+    {
+        "id": "dd297463438f7038",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "Trigger Producer PH",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 320,
+        "y": 1360,
+        "wires": [
+            [
+                "293f6f377caf4cdb"
+            ]
+        ]
+    },
+    {
+        "id": "62fbfb9bf9b6912a",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "ph",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a0bf0c5cf929e598",
+        "x": 1030,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "4b24d2c0804244c9",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "ph",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a0bf0c5cf929e598",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 700,
+        "wires": [
+            [
+                "bdad0fe33b02a10a"
+            ]
+        ]
+    },
+    {
+        "id": "e3a7d11dce6a7bf7",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "temperature",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 990,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "5314f976c99f1d3e",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "temperature",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1290,
+        "y": 1080,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "92b837187fe94fdf",
+        "type": "debug",
+        "z": "f6f2187d.f17ca8",
+        "name": "Subscribe G2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1660,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "7721402ec7ea0eff",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "humidity",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 1000,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "afd8ffb3f1b2a2c1",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "humidity",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1280,
+        "y": 1140,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "c60922c2155f287b",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "light",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 1010,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "258cd4179cb0c10a",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "light",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 1200,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "5adabd09907985d2",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "weight",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 1010,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "9231c79e5d41241d",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "weight",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 1260,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "309a7b11bc9202d8",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "impact",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 1010,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "d17d5a43b9f77df0",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "impact",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 1320,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "cdf4958ef868d519",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "open-door",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 990,
+        "y": 1380,
+        "wires": []
+    },
+    {
+        "id": "2b0188c7bd1b7a3d",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "open-door",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1280,
+        "y": 1380,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    },
+    {
+        "id": "6ecd6a0b64a10676",
+        "type": "mqtt out",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "ph",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "799e334559d78ed2",
+        "x": 1030,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "4907ed36de8905b3",
+        "type": "mqtt in",
+        "z": "f6f2187d.f17ca8",
+        "name": "",
+        "topic": "ph",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "799e334559d78ed2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 1270,
+        "y": 1440,
+        "wires": [
+            [
+                "92b837187fe94fdf"
+            ]
+        ]
+    }
+]

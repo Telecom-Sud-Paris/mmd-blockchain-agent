@@ -1,0 +1,45 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mmd-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mmd-server
+  template:
+    metadata:
+      labels:
+        app: mmd-server
+    spec:
+      containers:
+        - name: mmd-server
+          image: localhost:5000/mmd-server
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8080
+            initialDelaySeconds: 5
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mmd-server
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 32000
+  selector:
+    app: mmd-server
