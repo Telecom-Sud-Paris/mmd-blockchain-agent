@@ -104,7 +104,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 15 40}}\",\n    \"id\": \"Producer\"\n}",
+        "template": "{\n    \"value\": \"{{float 15 40}}\",\n    \"publisherId\": \"Producer\",\n    \"productId\": \"honey\"\n}",
         "x": 670,
         "y": 1200,
         "wires": [
@@ -121,7 +121,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 670,
         "y": 340,
         "wires": [
@@ -138,7 +138,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{float 1 6}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 690,
         "y": 840,
         "wires": [
@@ -298,7 +298,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Producer\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"publisherId\": \"Producer\",\n    \"productId\": \"honey\"\n}",
         "x": 660,
         "y": 1240,
         "wires": [
@@ -315,7 +315,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 660,
         "y": 380,
         "wires": [
@@ -332,7 +332,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 95}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 680,
         "y": 800,
         "wires": [
@@ -475,7 +475,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Producer\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"publisherId\": \"Producer\",\n    \"productId\": \"honey\"\n}",
         "x": 640,
         "y": 1280,
         "wires": [
@@ -492,7 +492,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 650,
         "y": 420,
         "wires": [
@@ -509,7 +509,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 20}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 670,
         "y": 760,
         "wires": [
@@ -652,7 +652,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Producer\"\n}",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"publisherId\": \"Producer\",\n    \"productId\": \"honey\"\n}",
         "x": 650,
         "y": 1320,
         "wires": [
@@ -669,7 +669,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 660,
         "y": 460,
         "wires": [
@@ -686,7 +686,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{float 0 20}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 670,
         "y": 720,
         "wires": [
@@ -806,7 +806,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 660,
         "y": 500,
         "wires": [
@@ -886,7 +886,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Transporter\"\n}",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"publisherId\": \"Transporter\",\n    \"productId\": \"fish\"\n}",
         "x": 670,
         "y": 540,
         "wires": [
@@ -966,7 +966,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{boolean}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 680,
         "y": 880,
         "wires": [
@@ -1007,7 +1007,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"id\": \"Food Processor\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"publisherId\": \"Food Processor\",\n    \"productId\": \"tomato\"\n}",
         "x": 660,
         "y": 920,
         "wires": [
@@ -1048,7 +1048,7 @@
         "field": "payload",
         "fieldType": "msg",
         "syntax": "text",
-        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"id\": \"Producer\"\n}",
+        "template": "{\n    \"value\": \"{{int 0 14}}\",\n    \"publisherId\": \"Producer\",\n    \"productId\": \"honey\"\n}",
         "x": 640,
         "y": 1360,
         "wires": [
