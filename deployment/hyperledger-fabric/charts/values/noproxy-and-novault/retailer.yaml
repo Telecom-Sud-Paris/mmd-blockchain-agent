@@ -1,0 +1,54 @@
+global:
+  version: 2.5.4
+  serviceAccountName: vault-auth
+  vault:
+    type: disabled  
+
+  cluster:
+    provider: minikube  
+    cloudNativeServices: false
+
+  proxy:
+    provider: "none"
+    externalUrlSuffix: retailer-net  # ✅ CORRECTED to retailer-net
+
+certs:
+  generateCertificates: true
+  orgData:
+    caAddress: ca.retailer-net:7054  # ✅ CORRECTED to retailer-net
+    caAdminUser: retailer-admin  # ✅ CORRECTED to retailer-admin
+    caAdminPassword: retailer-adminpw  # ✅ CORRECTED to retailer-adminpw
+    orgName: retailer  # ✅ CORRECTED to retailer
+    type: peer
+    componentSubject: "O=Retailer,OU=Retailer,L=51.50/-0.13/London,C=GB"
+  users: 
+    usersList:
+      - user:
+        identity: user1
+        attributes:
+        - key: "hf.Revoker"
+          value: "true"
+  settings:
+    createConfigMaps: true
+    refreshCertValue: false
+    addPeerValue: false
+    removeCertsOnDelete: true
+    removeOrdererTlsOnDelete: true
+
+storage:
+  enabled: true  
+  storageClass: "standard"  
+  size: 512Mi  
+
+peer:
+  gossipPeerAddress: 
+  logLevel: info
+  localMspId: retailerMSP  # ✅ CORRECTED to retailerMSP
+  tlsStatus: true
+  cliEnabled: true
+  ordererAddress: orderer1.supplychain-net:7050
+  builder: hyperledger/fabric-ccenv
+  couchdb:
+    username: retailer-user  # ✅ CORRECTED to retailer-user
+    password: retailer-userpw  # ✅ CORRECTED to retailer-userpw
+  upgrade: false

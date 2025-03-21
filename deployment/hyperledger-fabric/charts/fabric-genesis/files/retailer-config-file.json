@@ -1,0 +1,26 @@
+{
+    "apiVersion": "v1",
+    "data": {
+        "mspConfig": "NodeOUs:\n  Enable: true\n  ClientOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: client\n  PeerOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: peer\n  AdminOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: admin\n  OrdererOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: orderer"
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+        "annotations": {
+            "meta.helm.sh/release-name": "peer3",
+            "meta.helm.sh/release-namespace": "retailer-net"
+        },
+        "creationTimestamp": "2025-03-19T10:11:56Z",
+        "labels": {
+            "app.kubernetes.io/component": "fabric",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "peer3-msp-config",
+            "app.kubernetes.io/namespace": "retailer-net",
+            "app.kubernetes.io/part-of": "fabric-peernode-peer3",
+            "app.kubernetes.io/release": "peer3"
+        },
+        "name": "peer3-msp-config",
+        "namespace": "retailer-net",
+        "resourceVersion": "1113094",
+        "uid": "55d47c0e-b7cf-495a-9001-fa4aa9399e78"
+    }
+}

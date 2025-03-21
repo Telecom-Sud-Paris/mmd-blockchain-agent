@@ -1,0 +1,22 @@
+# Updated Helm values for fabric-ca-server in Minikube
+global:
+  serviceAccountName: vault-auth
+  cluster:
+    provider: minikube  # Changed from "azure" to "minikube"
+    cloudNativeServices: false
+  vault:
+    type: disabled  # Disabled Vault
+  proxy:
+    provider: none
+    externalUrlSuffix: supplychain-net
+
+storage:
+  storageClass: "standard"  # Added correct storage class for Minikube
+  size: 512Mi
+
+server:
+  removeCertsOnDelete: true
+  tlsStatus: true
+  adminUsername: supplychain-admin
+  adminPassword: supplychain-adminpw
+  subject: "/C=GB/ST=London/L=London/O=Orderer"
