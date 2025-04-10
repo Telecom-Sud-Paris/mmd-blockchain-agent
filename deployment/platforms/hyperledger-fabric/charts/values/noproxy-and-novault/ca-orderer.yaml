@@ -1,0 +1,23 @@
+# charts/values/noproxy-and-novault/ca-orderer.yaml
+
+global:
+  serviceAccountName: vault-auth
+  cluster:
+    provider: minikube
+    cloudNativeServices: false
+  vault:
+    type: disabled
+  proxy:
+    provider: none
+    externalUrlSuffix: supplychain-net
+
+storage:
+  storageClass: standard   # Important pour Minikube
+  size: 512Mi
+
+server:
+  removeCertsOnDelete: true
+  tlsStatus: true
+  adminUsername: supplychain-admin
+  adminPassword: supplychain-adminpw
+  subject: "/C=GB/ST=London/L=London/O=Orderer"

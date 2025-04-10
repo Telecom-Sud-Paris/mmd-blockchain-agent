@@ -1,0 +1,51 @@
+global:
+  version: 2.5.4
+  serviceAccountName: vault-auth
+  cluster:
+    provider: minikube
+    cloudNativeServices: false
+  vault:
+    type: disabled
+  proxy:
+    provider: none
+    externalUrlSuffix: supplychain-net
+
+organizations:
+  - name: supplychain
+    orderers:
+      - name: orderer1
+        ordererAddress: orderer1.supplychain-net:7050
+    peers:
+      - name: peer0
+        peerAddress: peer0.supplychain-net:7051
+      - name: peer1
+        peerAddress: peer1.supplychain-net:7051
+      - name: peer2
+        peerAddress: peer2.supplychain-net:7051
+
+consensus: raft
+
+channels:
+  - name: channel1
+    consortium: SupplyChainConsortium
+    orderers:
+      - supplychain
+    participants:
+      - supplychain  # shared by peer0 and peer1
+
+  - name: channel2
+    consortium: SupplyChainConsortium
+    orderers:
+      - supplychain
+    participants:
+      - supplychain  # shared by peer1 and peer2
+
+  - name: channel3
+    consortium: SupplyChainConsortium
+    orderers:
+      - supplychain
+    participants:
+      - supplychain  # shared by peer0 and peer2
+
+settings:
+  removeConfigMapOnDelete: true

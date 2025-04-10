@@ -1,0 +1,26 @@
+{
+    "apiVersion": "v1",
+    "data": {
+        "mspConfig": "NodeOUs:\n  Enable: true\n  ClientOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: client\n  PeerOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: peer\n  AdminOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: admin\n  OrdererOUIdentifier:\n    Certificate: cacerts/ca.crt\n    OrganizationalUnitIdentifier: orderer"
+    },
+    "kind": "ConfigMap",
+    "metadata": {
+        "annotations": {
+            "meta.helm.sh/release-name": "peer2",
+            "meta.helm.sh/release-namespace": "supplychain-net"
+        },
+        "creationTimestamp": "2025-04-08T12:27:31Z",
+        "labels": {
+            "app.kubernetes.io/component": "fabric",
+            "app.kubernetes.io/managed-by": "Helm",
+            "app.kubernetes.io/name": "peer2-msp-config",
+            "app.kubernetes.io/namespace": "supplychain-net",
+            "app.kubernetes.io/part-of": "fabric-peernode-peer2",
+            "app.kubernetes.io/release": "peer2"
+        },
+        "name": "peer2-msp-config",
+        "namespace": "supplychain-net",
+        "resourceVersion": "1873",
+        "uid": "0039106c-c780-4bbc-8529-ec9e50e0df02"
+    }
+}

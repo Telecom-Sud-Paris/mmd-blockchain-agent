@@ -1,0 +1,38 @@
+# charts/values/noproxy-and-novault/orderer.yaml
+
+global:
+  version: 2.5.4
+  serviceAccountName: vault-auth
+  vault:
+    type: disabled  # ✅ Désactivation de Vault
+
+  cluster:
+    provider: minikube  # ✅ Adapté à ton cluster local
+    cloudNativeServices: false
+
+  proxy:
+    provider: none
+    externalUrlSuffix: supplychain-net
+
+certs:
+  generateCertificates: true
+  orgData:
+    caAddress: ca.supplychain-net:7054
+    caAdminUser: supplychain-admin
+    caAdminPassword: supplychain-adminpw
+    orgName: supplychain
+    type: orderer
+    componentSubject: "O=Orderer,L=51.50/-0.13/London,C=GB"
+  settings:
+    # Flag to create configmaps for le 1er orderer
+    createConfigMaps: true
+    refreshCertValue: false
+    addPeerValue: false
+    removeCertsOnDelete: true
+    removeOrdererTlsOnDelete: true
+
+orderer:
+  consensus: raft
+  logLevel: info
+  localMspId: supplychainMSP
+  tlsstatus: true

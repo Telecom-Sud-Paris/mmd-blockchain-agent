@@ -1,0 +1,9 @@
+dependencies:
+- name: bevel-storageclass
+  repository: file://../../../shared/charts/bevel-storageclass
+  version: 1.0.0
+- name: fabric-catools
+  repository: file://../fabric-catools
+  version: 1.1.0
+digest: sha256:24288027c15d3c607a5396a51e3c1957194c450a9f736f7da85da01b098366ab
+generated: "2025-04-08T11:32:34.783870498+02:00"
