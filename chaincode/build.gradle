@@ -41,7 +41,7 @@ application {
 }
 
 checkstyle {
-    toolVersion '8.21'
+    toolVersion '10.5'
     configFile file("config/checkstyle/checkstyle.xml")
 }
 
