@@ -21,11 +21,10 @@ dependencies {
 }
 
 repositories {
-    mavenCentral() // Add this line for Maven Central
     maven {
         url "https://hyperledger.jfrog.io/hyperledger/fabric-maven"
     }
-    jcenter() // Consider removing this because JCenter is deprecated
+    jcenter()
     maven {
         url 'https://jitpack.io'
     }
@@ -42,7 +41,7 @@ application {
 }
 
 checkstyle {
-    toolVersion '10.12.2'
+    toolVersion '8.21'
     configFile file("config/checkstyle/checkstyle.xml")
 }
 
