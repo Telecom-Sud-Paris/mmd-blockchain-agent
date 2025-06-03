@@ -44,12 +44,13 @@ checkstyle {
     toolVersion = '8.21'
 }
 
-// Correct way for Gradle 8+
-tasks.withType(Checkstyle).configureEach {
-    configDirectory.set(file("$projectDir/config/checkstyle"))
-    configProperties = [
-        'config_loc': "$projectDir/config/checkstyle"
-    ]
+afterEvaluate {
+    tasks.withType(Checkstyle).configureEach {
+        configDirectory.set(file("$projectDir/config/checkstyle"))
+        configProperties = [
+            'config_loc': "$projectDir/config/checkstyle"
+        ]
+    }
 }
 
 checkstyleMain {
