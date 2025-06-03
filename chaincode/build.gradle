@@ -43,6 +43,9 @@ application {
 checkstyle {
     toolVersion '8.21'
     configFile file("config/checkstyle/checkstyle.xml")
+}
+
+tasks.withType(Checkstyle).configureEach {
     configProperties = [
         'config_loc': "${project.rootDir}/chaincode/config/checkstyle"
     ]
