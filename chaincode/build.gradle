@@ -42,11 +42,12 @@ application {
 
 checkstyle {
     toolVersion = '8.21'
+    // Do NOT set configFile here!
 }
 
-// Apply to all checkstyle tasks
+// Apply to all Checkstyle tasks, REQUIRED for Gradle 8.0+
 tasks.withType(Checkstyle).configureEach {
-    configDirectory = file("${project.rootDir}/chaincode/config/checkstyle")
+    configDirectory.set(file("${project.rootDir}/chaincode/config/checkstyle"))
     configProperties = [
         'config_loc': "${project.rootDir}/chaincode/config/checkstyle"
     ]
