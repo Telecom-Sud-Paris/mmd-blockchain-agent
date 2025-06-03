@@ -41,11 +41,12 @@ application {
 }
 
 checkstyle {
-    toolVersion '8.21'
-    configFile file("config/checkstyle/checkstyle.xml")
+    toolVersion = '8.21'
 }
 
+// Apply to all checkstyle tasks
 tasks.withType(Checkstyle).configureEach {
+    configDirectory = file("${project.rootDir}/chaincode/config/checkstyle")
     configProperties = [
         'config_loc': "${project.rootDir}/chaincode/config/checkstyle"
     ]
