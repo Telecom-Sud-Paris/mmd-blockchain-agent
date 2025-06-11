@@ -41,16 +41,8 @@ application {
 }
 
 checkstyle {
-    toolVersion = '8.21'
-}
-
-afterEvaluate {
-    tasks.withType(Checkstyle).configureEach {
-        configDirectory.set(file("$projectDir/config/checkstyle"))
-        configProperties = [
-            'config_loc': "$projectDir/config/checkstyle"
-        ]
-    }
+    toolVersion '10.25.0'
+    configFile file("config/checkstyle/checkstyle.xml")
 }
 
 checkstyleMain {
