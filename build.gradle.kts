@@ -3,7 +3,7 @@ val logback_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
-    id("io.ktor.plugin") version "2.3.12"
+    id("io.ktor.plugin") version "3.1.3"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
     id("com.diffplug.spotless") version "6.25.0"
     id("maven-publish")
@@ -84,5 +84,11 @@ tasks.withType<Test> {
 ktor {
     docker {
         jreVersion.set(JavaVersion.VERSION_21)
+    }
+    jib {
+        to {
+            image = "mmdtsp/mmd-blockchain-agent"
+            tags = setOf("${project.version}")
+        }
     }
 }
