@@ -10,9 +10,9 @@
 # peer each, and a single node Raft ordering service. Users can also use this
 # script to create a channel deploy a chaincode on the channel
 #
-# prepending $PWD/../bin to PATH to ensure we are picking up the correct binaries
+# prepending $PWD/../fabric-dependencies/bin to PATH to ensure we are picking up the correct binaries
 # this may be commented out to resolve installed version of tools if desired
-export PATH=/Users/michalkit/Git/tsp/fabric/fabric-samples/bin:$PATH
+export PATH=${PWD}/../fabric-dependencies/bin:$PATH
 export FABRIC_CFG_PATH=./configtx
 export VERBOSE=false
 
