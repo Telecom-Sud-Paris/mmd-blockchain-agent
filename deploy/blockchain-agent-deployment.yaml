@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain-agent
+  namespace: supplychain-net
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain-agent
+  template:
+    metadata:
+      labels:
+        app: blockchain-agent
+    spec:
+      containers:
+        - name: blockchain-agent
+          image: mmdtsp/mmd-blockchain-agent:latest
+          ports:
+            - containerPort: 8080
