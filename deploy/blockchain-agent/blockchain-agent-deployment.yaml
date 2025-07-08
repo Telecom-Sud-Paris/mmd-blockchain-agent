@@ -25,12 +25,6 @@ spec:
             - name: MQTT_PORT
               value: "1883"
             - name: MQTT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: mosquitto-passwords
-                  key: mqtt-username
+              value: "user1"
             - name: MQTT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mosquitto-passwords
-                  key: mqtt-password
+              value: "mmd1"
