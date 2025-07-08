@@ -5,7 +5,7 @@ metadata:
   namespace: supplychain-net
 spec:
   selector:
-    app: mosquitto1
+    app: mosquitto
   type: ClusterIP
   ports:
     - protocol: TCP

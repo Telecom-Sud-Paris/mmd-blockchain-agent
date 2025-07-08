@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mosquitto1
+  name: mosquitto
   namespace: supplychain-net
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mosquitto1
+      app: mosquitto
   template:
     metadata:
       labels:
-        app: mosquitto1
+        app: mosquitto
     spec:
       containers:
       - name: mosquitto
