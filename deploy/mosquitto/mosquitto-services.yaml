@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto1
+  namespace: supplychain-net
+spec:
+  selector:
+    app: mosquitto1
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto2
+  namespace: supplychain-net
+spec:
+  selector:
+    app: mosquitto2
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 1883
+      targetPort: 1883
