@@ -48,7 +48,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-
 # Emacs backup files
 *~
 *#

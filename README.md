@@ -13,6 +13,8 @@ MMD Blockchain Agent, Copyright Télécom SudParis and Institut Mines-Télécom,
 ## Building
 Required: JDK 11, Fabric 2.2 binaries installed
 
+For the smart contracts in Javascript, the working versions are node v14.21.3 and npm 6.14.18
+
 You might need to execute `docker pull --platform amd64 hyperledger/fabric-javaenv:2.2` if on Mac
 
 ## Running
@@ -20,3 +22,4 @@ You might need to execute `docker pull --platform amd64 hyperledger/fabric-javae
 Start network by running `./startFabric.sh`
 
 Bring network down by running `./networkDown.sh`
+
