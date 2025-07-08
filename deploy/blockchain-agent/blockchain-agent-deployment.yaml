@@ -30,4 +30,4 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: mosquitto-passwords
-                  key: password.txt
+                  key: mqtt-password
