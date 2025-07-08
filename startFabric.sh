@@ -8,11 +8,11 @@
 set -e
 
 # don't rewrite paths for Windows Git Bash users
-export MSYS_NO_PATHCONV=1
-starttime=$(date +%s)
-CC_SRC_LANGUAGE="java"
-CC_SRC_LANGUAGE=`echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:]`
-CC_SRC_PATH="../chaincode"
+# export MSYS_NO_PATHCONV=1
+# starttime=$(date +%s)
+# CC_SRC_LANGUAGE="javascript"
+# CC_SRC_LANGUAGE=`echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:]`
+# CC_SRC_PATH="../chaincode"
 
 # clean out any old identities in the wallets
 rm -rf wallet/*.id
@@ -21,7 +21,7 @@ rm -rf wallet/*.id
 pushd ./test-network
 ./network.sh down
 ./network.sh up createChannel -ca -s couchdb
-./network.sh deployCC -ccn PropertyContract -ccv 1 -cci initLedger -ccl ${CC_SRC_LANGUAGE} -ccp ${CC_SRC_PATH}
+#./network.sh deployCC -ccn PropertyContract -ccv 1 -cci initLedger -ccl ${CC_SRC_LANGUAGE} -ccp ${CC_SRC_PATH}
 popd
 
 cat <<EOF
@@ -39,9 +39,10 @@ Java:
     mvn test
 
   The test will invoke the sample client app which perform the following:
-    - Enroll admin and appUser and import them into the wallet (if they don't already exist there)
+    - Enroll admin and appUser and import them into the wallet (if they dont already exist there)
     - Submit a transaction to create a new car
     - Evaluate a transaction (query) to return details of this car
     - Submit a transaction to change the owner of this car
     - Evaluate a transaction (query) to return the updated details of this car
 EOF
+

@@ -7,7 +7,7 @@ MMD Blockchain Agent, Copyright Télécom SudParis and Institut Mines-Télécom,
     3. sudo apt install openjdk-11-jdk
 
 - Fabric 2.2:
-    1. cd fabric-dependencies
+    1. curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && chmod +x install-fabric.sh
     2. ./install-fabric.sh --fabric-version 2.2.13 binary
 
 ## Building
@@ -17,4 +17,6 @@ You might need to execute `docker pull --platform amd64 hyperledger/fabric-javae
 
 ## Running
 
-Start network by `./startFabric.sh`
+Start network by running `./startFabric.sh`
+
+Bring network down by running `./networkDown.sh`
