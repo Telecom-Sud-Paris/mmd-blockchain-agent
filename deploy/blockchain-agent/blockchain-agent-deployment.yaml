@@ -21,7 +21,7 @@ spec:
             - containerPort: 8080
           env:
             - name: MQTT_HOST
-              value: mosquitto.supplychain-net.svc.cluster.local
+              value: "mosquitto"
             - name: MQTT_PORT
               value: "1883"
             - name: MQTT_USERNAME
