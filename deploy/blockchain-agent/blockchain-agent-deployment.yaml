@@ -27,4 +27,4 @@ spec:
             - name: MQTT_USERNAME
               value: "user1"
             - name: MQTT_PASSWORD
-              value: "mmd1"
+              value: "password123"
