@@ -24,3 +24,7 @@ spec:
               value: "mosquitto.supplychain-net.svc.cluster.local"
             - name: MQTT_PORT
               value: "1883"
+            - name: MQTT_USERNAME
+              value: "user1"
+            - name: MQTT_PASSWORD
+              value: "mmd1"

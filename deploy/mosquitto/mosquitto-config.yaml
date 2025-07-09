@@ -6,5 +6,5 @@ metadata:
 data:
   mosquitto.conf: |
     listener 1883
-    allow_anonymous false
+    allow_anonymous true
     password_file /mosquitto/config/passwords.txt
