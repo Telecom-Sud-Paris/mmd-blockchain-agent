@@ -16,7 +16,7 @@ class PropertyContract extends Contract {
 
     
     async initLedger(ctx) {
-        console.info('============= START : Initialize Ledger ===========');
+        console.log('============= START : Initialize Ledger ===========');
         const initialProperties = [
             {
                 productId: 'product1',
@@ -40,12 +40,12 @@ class PropertyContract extends Contract {
                 property.timestamp
             );
         }   
-        console.info('============= END : Initialize Ledger ===========');
+        console.log('============= END : Initialize Ledger ===========');
     }
 
 
     async createOrUpdateProductProperty(ctx, productId, propertyName, propertyValue, timestamp) {
-        console.info('============= START : createOrUpdateProductProperty ===========');
+        console.log('============= START : createOrUpdateProductProperty ===========');
 
         const productProperty = {
             name: propertyName,
@@ -59,13 +59,13 @@ class PropertyContract extends Contract {
 
         await ctx.stub.putState(compositeKey, propertyBuffer);
 
-        console.info('============= END : createOrUpdateProductProperty ===========');
+        console.log('============= END : createOrUpdateProductProperty ===========');
         return JSON.stringify(productProperty);
     }
 
    
     async queryProductProperties(ctx, productId) {
-        console.info('============= START : queryProductProperties ===========');
+        console.log('============= START : queryProductProperties ===========');
 
         const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productId]);
 
@@ -95,7 +95,7 @@ class PropertyContract extends Contract {
             properties: properties
         };
 
-        console.info('============= END : queryProductProperties ===========');
+        console.log('============= END : queryProductProperties ===========');
         return JSON.stringify(productProperties);
     }
 }
