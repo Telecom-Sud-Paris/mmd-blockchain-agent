@@ -25,6 +25,6 @@ spec:
             - name: MQTT_PORT
               value: "1883"
             - name: MQTT_USERNAME
-              value: "user"
+              value: "user1"
             - name: MQTT_PASSWORD
-              value: "password"
+              value: "mmd1"
