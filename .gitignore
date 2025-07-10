@@ -4,9 +4,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-fabric-dependencies/bin
-fabric-dependencies/config
-!fabric-dependencies/install-fabric.sh
+# installed Fabric binaries etc.
+/bin/
+builders/
+config/
+external-chaincode/
+install-fabric.sh
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -44,3 +47,25 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Emacs backup files
+*~
+*#
+.#*
+# Vim file artifacts
+.*.sw*
+# installed platform-specific binaries
+/bin
+/config
+.DS_Store
+.project
+# omit Go vendor directories
+vendor/
+.vscode
+.gradle
+.idea
+# Dependency directories
+node_modules/
+# Ignore Gradle build output directory
+build
+package-lock.json
