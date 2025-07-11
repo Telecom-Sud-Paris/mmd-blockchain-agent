@@ -10,7 +10,7 @@ import mqtt.packets.mqttv5.SubscriptionOptions
 
 data class ClientConfig(
     val id: String,
-    val subscriptionTopics: List<String>,
+    val subscriptionTopics: String,
     val mqttVersion: MQTTVersion,
     val address: String,
     val port: Int,
@@ -20,7 +20,7 @@ data class ClientConfig(
 
 fun ApplicationConfig.toClientWithTopics() = ClientConfig(
     id = requiredProperty("id"),
-    subscriptionTopics = requiredListProperty("subscriptionTopics"),
+    subscriptionTopics = requiredProperty("subscriptionTopics"),
     mqttVersion = MQTTVersion.MQTT5,
     address = requiredProperty("host"),
     port = requiredProperty("port").toInt(),
@@ -32,17 +32,15 @@ private fun ApplicationConfig.requiredProperty(name: String) = requireNotNull(pr
     "Configuration property '$name' is missing"
 }.getString()
 
-private fun ApplicationConfig.requiredListProperty(name: String) = requireNotNull(propertyOrNull(name)) {
-    "Configuration property '$name' is missing"
-}.getList()
-
 @OptIn(ExperimentalUnsignedTypes::class)
 fun ClientConfig.createClientAndSubscribe(publishCallback: (String, MQTTPublish) -> Unit) = MQTTClient(
-    mqttVersion,
-    address,
-    port,
-    null,
-    publishReceived = { message -> publishCallback(id, message) }
+    mqttVersion = mqttVersion,
+    address = address,
+    port = port,
+    tls = null,
+    publishReceived = { message -> publishCallback(id, message) },
+    userName = username,
+    password = password.toByteArray().toUByteArray()
 ).apply {
-    subscribe(subscriptionTopics.map { Subscription(it, SubscriptionOptions(Qos.EXACTLY_ONCE)) })
+    subscribe(subscriptionTopics.split(',').map { Subscription(it.trim(), SubscriptionOptions(Qos.EXACTLY_ONCE)) })
 }
