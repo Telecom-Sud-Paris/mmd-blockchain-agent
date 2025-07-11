@@ -20,11 +20,22 @@ spec:
           ports:
             - containerPort: 8080
           env:
-            - name: MQTT_HOST
-              value: mosquitto.supplychain-net.svc.cluster.local
-            - name: MQTT_PORT
+            # === Gateway A ===
+            - name: GATEWAY_A_HOST
+              value: "mosquitto1.supplychain-net.svc.cluster.local"
+            - name: GATEWAY_A_PORT
               value: "1883"
-            - name: MQTT_USERNAME
+            - name: GATEWAY_A_USERNAME
               value: "user1"
-            - name: MQTT_PASSWORD
+            - name: GATEWAY_A_PASSWORD
+              value: "mmd1"
+
+            # === Gateway B ===
+            - name: GATEWAY_B_HOST
+              value: "mosquitto2.supplychain-net.svc.cluster.local"
+            - name: GATEWAY_B_PORT
+              value: "1883"
+            - name: GATEWAY_B_USERNAME
+              value: "user1"
+            - name: GATEWAY_B_PASSWORD
               value: "mmd1"
