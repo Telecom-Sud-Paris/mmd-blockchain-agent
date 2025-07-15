@@ -41,7 +41,7 @@ spec:
               value: "mmd1"
           volumeMounts:
             - name: ca-cert
-              mountPath: /test-network/organizations/peerOrganizations/org1.example.com/ca.org1.example.com-cert.pem
+              mountPath: /test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
               readOnly: true
       volumes:
         - name: ca-cert
