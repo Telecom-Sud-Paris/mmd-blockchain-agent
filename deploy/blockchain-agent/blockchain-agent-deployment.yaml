@@ -39,3 +39,11 @@ spec:
               value: "user1"
             - name: GATEWAY_B_PASSWORD
               value: "mmd1"
+          volumeMounts:
+            - name: ca-cert
+              mountPath: /test-network/organizations/peerOrganizations/org1.example.com/ca
+              readOnly: true
+      volumes:
+        - name: ca-cert
+          secret:
+            secretName: blockchain-agent-ca-cert
