@@ -20,14 +20,12 @@ const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUser';
 
 // =========== config MQTT ===========
-const brokerUrl = 'mqtt://172.17.0.1:1883';
-const topic = '#'; 
+const brokerUrl = 'mqtt://172.17.0.1:1883'; //gateway 1
+const topic = '#'; //listen to all topics
 
 function prettyJSONString(inputString) {
 	return JSON.stringify(JSON.parse(inputString), null, 2);
 }
-
-
 
 async function main() {
     let contract;
@@ -127,11 +125,7 @@ async function main() {
     mqttClient.on('message', (receivedTopic, message) => {
     const messageString = message.toString();
     console.log(`\nReceived and queued message from topic "${receivedTopic}"`);
-    
-    // Adiciona a mensagem e o tópico na nossa fila interna
     messageQueue.push({ receivedTopic, messageString });
-
-    // Inicia o processamento da fila
     processQueue();
     });
 

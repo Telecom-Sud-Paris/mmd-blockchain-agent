@@ -8,7 +8,6 @@
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
-const mqtt = require('mqtt');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js'); 
 const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js'); 
 
@@ -19,9 +18,6 @@ const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUser';
 
-// =========== config MQTT ===========
-const brokerUrl = 'mqtt://172.17.0.1:1883';
-const topic = 'temperature'; 
 
 function prettyJSONString(inputString) {
 	return JSON.stringify(JSON.parse(inputString), null, 2);
@@ -70,7 +66,7 @@ async function main() {
             'queryAllProducts'
         )
         console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
-        
+
     } catch (error) {
         console.error('Failed to submit transaction:', error);
     }
@@ -80,7 +76,6 @@ async function main() {
     // --- disconnection ---
     const shutdown = async () => {
         console.log('\nShutting down...');
-        mqttClient.end();
         if (gateway) {
             gateway.disconnect();
         }
