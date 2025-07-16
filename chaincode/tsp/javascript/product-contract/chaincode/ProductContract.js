@@ -10,7 +10,7 @@ const { Contract } = require('fabric-contract-api');
  * ProductContract
  *
  * A smart contract that manages properties associated with products in a supply chain.
- * It allows different publishers (such as transporters or warehouses),
+ * It allows different publishers (such as transporters or food producers),
  * to register and update data (properties) about products, like temperature, location, etc.
  *
  * Each property is uniquely identified by the combination of:
@@ -19,30 +19,23 @@ const { Contract } = require('fabric-contract-api');
  * - Publisher ID
  */
 class ProductContract extends Contract {
-
     constructor() {
         // define unique namespace for this contract to avoid conflicts
         super('tsp.ProductContract');
     }
-
-    
     async initLedger(ctx) {
         console.log('============= START : Initialize Ledger ===========');
         console.log('============= END : Initialize Ledger ===========');
     }
 
 
-
     // managing functions
 
     /**
     * @dev Creates a new product property or updates it if it already exists for a specific publisher.
-    * This function combines the logic of creating and updating into a single atomic transaction.
-    * It checks for the existence of a property using its composite key. If found, it updates
-    * the value and timestamp. If not found, it creates a new property record.
     * @param {Context} ctx The transaction context.
     * @param {string} publisherId The ID of the entity publishing the property (e.g., 'Transporter').
-    * @param {string} productId The ID of the product the property refers to (e.g., 'fish-001').
+    * @param {string} productId The ID of the product the property refers to (e.g., 'fish').
     * @param {string} propertyName The name of the property (e.g., 'temperature').
     * @param {string} propertyValue The new or initial value for the property (e.g., '16.5').
     * @returns {string} The created or updated property object in JSON format.
@@ -124,7 +117,6 @@ class ProductContract extends Contract {
         console.log(`Property deleted successfully: ${compositeKey}`);
         console.log('============= END : deleteProductProperty ===========');
     }
-
 
 
 
@@ -217,7 +209,6 @@ class ProductContract extends Contract {
         console.log('============= END : queryProductProperties ===========');
         return JSON.stringify(response);
     }
-
 
 
     // Util functions
