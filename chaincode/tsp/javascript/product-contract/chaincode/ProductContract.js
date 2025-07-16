@@ -56,7 +56,8 @@ class ProductContract extends Contract {
         // uniquely identifies the property for a specific product and publisher
         const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
         const txTimestamp = ctx.stub.getTxTimestamp();
-        const timestamp = txTimestamp.toDate().toISOString();
+        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
+        const timestamp = date.toISOString();
 
         const existingPropertyBuffer = await ctx.stub.getState(compositeKey);
 

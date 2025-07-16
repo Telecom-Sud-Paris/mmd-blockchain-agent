@@ -1,5 +1,5 @@
 
-const mqtt = require('mqtt'); // Para CommonJS
+const mqtt = require('mqtt'); 
 
 const brokerUrl = 'mqtt://172.17.0.1:1883';
 

@@ -9,8 +9,8 @@ const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
 const mqtt = require('mqtt');
-const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js'); // Ajuste o caminho se necessário
-const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js'); // Ajuste o caminho se necessário
+const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js'); 
+const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js'); 
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
@@ -21,11 +21,13 @@ const org1UserId = 'appUser';
 
 // =========== config MQTT ===========
 const brokerUrl = 'mqtt://172.17.0.1:1883';
-const topic = 'temperature'; 
+const topic = '#'; 
 
 function prettyJSONString(inputString) {
 	return JSON.stringify(JSON.parse(inputString), null, 2);
 }
+
+
 
 async function main() {
     let contract;
@@ -55,7 +57,7 @@ async function main() {
         console.log('Fabric connection successful. Contract object is ready.');
 
         await contract.submitTransaction('initLedger');
-
+        console.log('Ledger initialized successfully.');
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);
@@ -67,44 +69,70 @@ async function main() {
     const mqttClient = mqtt.connect(brokerUrl);
 
     mqttClient.on('connect', () => {
-        console.log('Connected to MQTT broker!');
+        console.log('Connected to MQTT broker');
         mqttClient.subscribe(topic, (err) => {
             if (!err) {
-                console.log(`👂 Subscribed and listening to topic: ${topic}`);
+                console.log(`Subscribed and listening to topic: ${topic}`);
             } else {
                 console.error('MQTT subscription error:', err);
             }
         });
     });
 
-    // processing incoming MQTT messages
-    mqttClient.on('message', async (receivedTopic, message) => {
-    const messageString = message.toString();
-    console.log(`\nReceived message from topic "${receivedTopic}"`);
+    // ========== message queue ==========
+    const messageQueue = [];
+    let isProcessing = false;
 
-    try {
-        const data = JSON.parse(messageString);
-        console.log('Parsed JSON data:', data);
-        const propertyName = receivedTopic;
-
-        if (!data.publisherId || !data.productId || !propertyName || data.value === undefined) {
-            throw new Error('Invalid message format. Missing publisherId, productId, propertyName, or value.');
+    async function processQueue() {
+        if (isProcessing || messageQueue.length === 0) {
+            return;
         }
+        isProcessing = true;
 
-        console.log('Submitting transaction to create or update property...');
-        const commit = await contract.submitTransaction(
-            'upsertProductProperty',
-            data.publisherId,
-            data.productId,
-            propertyName,
-            String(data.value)
-        );
-        console.log(`*** Transaction committed successfully!`);
-        console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
+        const { receivedTopic, messageString } = messageQueue.shift();  //get next message from queue
+        console.log(`\n>> Processing message from topic "${receivedTopic}"`);
 
-    } catch (error) {
-        console.error('Failed to submit transaction:', error);
+        try {
+            const data = JSON.parse(messageString);
+            console.log('Parsed JSON data:', data);
+            const propertyName = receivedTopic;
+
+            if (!data.publisherId || !data.productId || !propertyName || data.value === undefined) {
+                throw new Error('Invalid message format. Missing publisherId, productId, propertyName, or value.');
+            }
+
+            console.log('Submitting transaction to create or update property...');
+            const commit = await contract.submitTransaction(
+                'upsertProductProperty',
+                data.publisherId,
+                data.productId,
+                propertyName,
+                String(data.value)
+            );
+            console.log(`*** Transaction committed successfully!`);
+            console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
+
+        } catch (error) {
+            // do a retry logic here if needed
+            console.error(`Failed to submit transaction for topic ${receivedTopic}:`, error);
+        } finally {
+            //release the processing flag
+            isProcessing = false;
+            //process next message in the queue
+            setImmediate(processQueue);
+        }
     }
+
+    // processing incoming MQTT messages
+    mqttClient.on('message', (receivedTopic, message) => {
+    const messageString = message.toString();
+    console.log(`\nReceived and queued message from topic "${receivedTopic}"`);
+    
+    // Adiciona a mensagem e o tópico na nossa fila interna
+    messageQueue.push({ receivedTopic, messageString });
+
+    // Inicia o processamento da fila
+    processQueue();
     });
 
     mqttClient.on('error', (err) => {
