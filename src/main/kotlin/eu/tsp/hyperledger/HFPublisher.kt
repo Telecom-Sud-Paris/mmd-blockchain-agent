@@ -21,44 +21,43 @@ class HFPublisher(private val userName: String) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun enrolUsers() {
-//        enrolAdmin()
-//        enrolUser()
+        enrolAdmin()
+        enrolUser()
     }
 
-//    private val builder by lazy {
-//        Gateway.createBuilder().apply {
-//            val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
-//            val networkConfigPath = Paths.get(
-//                "test-network",
-//                "organizations",
-//                "peerOrganizations",
-//                "org1.example.com",
-//                "connection-org1.yaml"
-//            )
-//            identity(wallet, userName).networkConfig(networkConfigPath).discovery(true)
-//        }
-//    }
+    private val builder by lazy {
+        Gateway.createBuilder().apply {
+            val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
+            val networkConfigPath = Paths.get(
+                "test-network",
+                "organizations",
+                "peerOrganizations",
+                "org1.example.com",
+                "connection-org1.yaml"
+            )
+            identity(wallet, userName).networkConfig(networkConfigPath).discovery(true)
+        }
+    }
 
     fun publish(publisherId: String, productId: String, propertyName: String, value: String) {
-        logger.info("Publishing property '$propertyName' with value '$value' for product '$productId' by publisher '$publisherId'")
-//        builder.connect().use { gateway ->
-//
-//            // get the network and contract
-//            val network: Network = gateway.getNetwork("mychannel")
-//            val contract: Contract = network.getContract("PropertyContract")
-//            val timestamp = System.currentTimeMillis()
-//
-//            contract.submitTransaction("createOrUpdateProductProperty", productId, propertyName, value, timestamp.toString())
-//            val result = contract.evaluateTransaction("queryProductProperties", productId)
-//            logger.info("Ledger: ${String(result)}")
-//        }
+        builder.connect().use { gateway ->
+
+            // get the network and contract
+            val network: Network = gateway.getNetwork("mychannel")
+            val contract: Contract = network.getContract("PropertyContract")
+            val timestamp = System.currentTimeMillis()
+
+            contract.submitTransaction("createOrUpdateProductProperty", productId, propertyName, value, timestamp.toString())
+            val result = contract.evaluateTransaction("queryProductProperties", productId)
+            logger.info("Ledger: ${String(result)}")
+        }
     }
 
     private fun enrolUser() {
         // Create a CA client for interacting with the CA.
         val props = Properties()
         props["pemFile"] =
-            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem"
+            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
         val caClient = HFCAClient.createNewInstance("https://localhost:7054", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
@@ -112,7 +111,7 @@ class HFPublisher(private val userName: String) {
 
         val props = Properties()
         props["pemFile"] =
-            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem"
+            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
         val caClient = HFCAClient.createNewInstance("https://localhost:7054", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
