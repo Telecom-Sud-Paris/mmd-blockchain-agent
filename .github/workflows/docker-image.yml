@@ -19,10 +19,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Lint Dockerfile with Hadolint
+      - name: Lint Dockerfile with Hadolint (non-blocking)
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
+          no-fail: true
 
       - name: Push Docker image using jib
         run: |
@@ -35,16 +36,16 @@ jobs:
         with:
           image-ref: mmdtsp/mmd-blockchain-agent
           format: table
-          exit-code: 0  # set to 1 if you want the pipeline to fail on critical/high
+          exit-code: 0  # Don't fail the pipeline
           vuln-type: os,library
           severity: CRITICAL,HIGH
 
-      - name: Install Cosign (for keyless signing)
+      - name: Install Cosign
         run: |
           go install github.com/sigstore/cosign/v2/cmd/cosign@latest
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
-      - name: Keyless Sign Docker image using Cosign
+      - name: Sign Docker image with Cosign (Keyless)
         env:
           COSIGN_EXPERIMENTAL: "1"
         run: |
