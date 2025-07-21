@@ -1,0 +1,74 @@
+- productId: 'fish'
+  rules:
+    - propertyName: 'temperature'
+      # Fish must be kept refrigerated during transport.
+      condition: 'less_than_or_equal'
+      value: 4
+      alertMessage: 'ALERT: Fish temperature has exceeded the safe limit of 4°C!'
+    
+    - propertyName: 'humidity'
+      # Humidity should be high to prevent the product from drying out.
+      condition: 'greater_than'
+      value: 85
+      alertMessage: 'ALERT: Humidity for fish is below the optimal level of 85%!'
+    
+    - propertyName: 'impact'
+      # Any physical impact during transport should trigger an alert.
+      # Rule checks if value is not 0 (0 is false, 1 is true).
+      condition: 'equal'
+      value: 0
+      alertMessage: 'ALERT: Physical impact detected during fish transport!'
+    
+    - propertyName: 'open-door'
+      # The container door being opened at an unauthorized time is a risk.
+      # Rule checks if value is not 0 (where 0 is false, 1 is true).
+      condition: 'equal'
+      value: 0
+      alertMessage: 'ALERT: Container door was opened during fish transport!'
+
+    - propertyName: 'light'
+      # Fish should not be exposed to light during transport.
+      condition: 'equal'
+      value: 0
+      alertMessage: 'ALERT: Light exposure detected during fish transport!'
+
+
+
+- productId: 'tomato'
+  rules:
+    - propertyName: 'temperature'
+      condition: 'greater_than'
+      value: 10
+      alertMessage: 'ALERT: Tomato storage temperature is below the optimal 10°C.'
+    
+    - propertyName: 'ph'
+      condition: 'less_than'
+      value: 4.6
+      alertMessage: 'ALERT: Tomato pH is above the safe maximum of 4.6!'
+
+    - propertyName: 'humidity'
+      condition: 'greater_than'
+      value: 90
+      alertMessage: 'ALERT: Tomato storage humidity is below the optimal 90%.'
+
+    - propertyName: 'light'
+      condition: 'equal'
+      value: 0
+      alertMessage: 'ALERT: Light exposure detected during tomato transport!'
+
+    - propertyName: 'open-door'
+      condition: 'equal'
+      value: 0
+      alertMessage: 'ALERT: Container door was opened during tomato transport!'
+
+- productId: 'honey'
+  rules:
+    - propertyName: 'temperature'
+      condition: 'less_than'
+      value: 40
+      alertMessage: 'ALERT: Honey storage temperature has exceeded 40°C, risking degradation.'
+    
+    - propertyName: 'humidity'
+      condition: 'less_than'
+      value: 60
+      alertMessage: 'ALERT: Ambient humidity for honey is over 60%, risking moisture absorption!'

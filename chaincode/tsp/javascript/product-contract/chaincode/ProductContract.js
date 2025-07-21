@@ -86,6 +86,29 @@ class ProductContract extends Contract {
         ctx.stub.setEvent(eventName, eventPayload);
 
         console.log(`Upsert successful for: ${JSON.stringify(finalProperty)}`);
+
+        // Invoke QualityControlContract to check the property
+        console.log('Invoking QualityControlContract to check property...');
+        const chaincode = 'QualityControlContract'; 
+        const channelName = ctx.stub.getChannelID();
+
+        try {
+            const args = [
+                'checkQuality',
+                productId,
+                propertyName,
+                propertyValue
+            ];
+            
+            const response = await ctx.stub.invokeChaincode(chaincode, args, channelName);
+            const status = response.payload.toString('utf8');
+            
+            console.log(`QualityControl check response status: ${status}`);
+
+        } catch (error) {
+            console.error(`Failed to invoke QualityControlContract: ${error.message}`);
+        }
+
         console.log('============= END : upsertProductProperty ===========');
 
         return JSON.stringify(finalProperty);

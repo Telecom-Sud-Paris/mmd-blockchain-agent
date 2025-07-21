@@ -17,7 +17,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'product';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUser';
+const org1UserId = 'appUserListener';
 
 // =========== config MQTT ===========
 const brokerUrl = 'mqtt://172.17.0.1:1883'; //gateway 1
