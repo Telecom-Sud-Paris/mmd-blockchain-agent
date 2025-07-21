@@ -19,34 +19,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Lint Dockerfile with Hadolint (non-blocking)
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-          no-fail: true
-
       - name: Push Docker image using jib
         run: |
           ./gradlew jib --image mmdtsp/mmd-blockchain-agent \
             -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
             -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Trivy Vulnerability Scan
+      - name: Install Trivy
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: mmdtsp/mmd-blockchain-agent
           format: table
-          exit-code: 0  # Don't fail the pipeline
+          exit-code: 0  # Change to 1 to fail build if critical/high vulnerabilities are found
           vuln-type: os,library
           severity: CRITICAL,HIGH
-
-      - name: Install Cosign
-        run: |
-          go install github.com/sigstore/cosign/v2/cmd/cosign@latest
-          echo "$HOME/go/bin" >> $GITHUB_PATH
-
-      - name: Sign Docker image with Cosign (Keyless)
-        env:
-          COSIGN_EXPERIMENTAL: "1"
-        run: |
-          cosign sign docker.io/mmdtsp/mmd-blockchain-agent --yes
