@@ -2,6 +2,7 @@ package eu.tsp.mqtt
 
 import com.google.gson.Gson
 import eu.tsp.hyperledger.HFPublisher
+import eu.tsp.hyperledger.toHyperledgerClientConfig
 import io.ktor.server.config.*
 import mqtt.packets.mqtt.MQTTPublish
 import org.slf4j.LoggerFactory
@@ -19,7 +20,7 @@ class MqttBrokerListener(config: ApplicationConfig) {
 
     //Publisher ID to MessageConsumer
     private val messageConsumers = mutableMapOf<String, MessageConsumer>()
-    private val hfPublisher = HFPublisher("kitm").apply { enrolUsers() }
+    private val hfPublisher = HFPublisher(config.config("hyperledger").toHyperledgerClientConfig()).apply { enrolUsers() }
     private val gson = Gson()
 
     fun initialize() {

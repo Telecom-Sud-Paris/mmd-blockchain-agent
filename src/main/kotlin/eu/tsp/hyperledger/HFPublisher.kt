@@ -12,10 +12,10 @@ import java.nio.file.Paths
 import java.security.PrivateKey
 import java.util.*
 
-class HFPublisher(private val userName: String) {
+class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
 
     init {
-        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "true")
+        System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "false")
     }
 
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -35,7 +35,7 @@ class HFPublisher(private val userName: String) {
                 "org1.example.com",
                 "connection-org1.yaml"
             )
-            identity(wallet, userName).networkConfig(networkConfigPath).discovery(true)
+            identity(wallet, clientConfig.walletUsername).networkConfig(networkConfigPath).discovery(true)
         }
     }
 
@@ -59,7 +59,7 @@ class HFPublisher(private val userName: String) {
         props["pemFile"] =
             "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
-        val caClient = HFCAClient.createNewInstance("https://localhost:7054", props)
+        val caClient = HFCAClient.createNewInstance("https://${clientConfig.caAddress}", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
         caClient.cryptoSuite = cryptoSuite
 
@@ -69,8 +69,8 @@ class HFPublisher(private val userName: String) {
 
 
         // Check to see if we've already enrolled the user.
-        if (wallet[userName] != null) {
-            println("An identity for the user $userName already exists in the wallet")
+        if (wallet[clientConfig.walletUsername] != null) {
+            println("An identity for the user ${clientConfig.walletUsername} already exists in the wallet")
             return
         }
 
@@ -96,14 +96,14 @@ class HFPublisher(private val userName: String) {
 
 
         // Register the user, enroll the user, and import the new identity into the wallet.
-        val registrationRequest = RegistrationRequest(userName)
+        val registrationRequest = RegistrationRequest(clientConfig.walletUsername)
         registrationRequest.affiliation = "org1.department1"
-        registrationRequest.enrollmentID = userName
+        registrationRequest.enrollmentID = clientConfig.walletUsername
         val enrollmentSecret = caClient.register(registrationRequest, admin)
-        val enrollment = caClient.enroll(userName, enrollmentSecret)
+        val enrollment = caClient.enroll(clientConfig.walletUsername, enrollmentSecret)
         val user: Identity = Identities.newX509Identity("Org1MSP", enrollment)
-        wallet.put(userName, user)
-        println("Successfully enrolled user $userName and imported it into the wallet")
+        wallet.put(clientConfig.walletUsername, user)
+        println("Successfully enrolled user ${clientConfig.walletUsername} and imported it into the wallet")
     }
 
     private fun enrolAdmin() {
@@ -113,7 +113,7 @@ class HFPublisher(private val userName: String) {
         props["pemFile"] =
             "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
-        val caClient = HFCAClient.createNewInstance("https://localhost:7054", props)
+        val caClient = HFCAClient.createNewInstance("https://${clientConfig.walletUsername}", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
         caClient.cryptoSuite = cryptoSuite
 
@@ -128,7 +128,7 @@ class HFPublisher(private val userName: String) {
 
         // Enroll the admin user, and import the new identity into the wallet.
         val enrollmentRequestTLS = EnrollmentRequest()
-        enrollmentRequestTLS.addHost("localhost")
+        enrollmentRequestTLS.addHost(clientConfig.caAddress)
         enrollmentRequestTLS.profile = "tls"
         val enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS)
         val user: Identity = Identities.newX509Identity("Org1MSP", enrollment)
