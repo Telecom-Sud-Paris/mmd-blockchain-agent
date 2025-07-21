@@ -24,3 +24,12 @@ jobs:
           ./gradlew jib --image mmdtsp/mmd-blockchain-agent \
             -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
             -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: mmdtsp/mmd-blockchain-agent
+          format: table
+          exit-code: 0  # Change to 1 to fail build if critical/high vulnerabilities are found
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
