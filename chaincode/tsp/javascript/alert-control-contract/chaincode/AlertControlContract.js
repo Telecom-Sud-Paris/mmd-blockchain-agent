@@ -6,9 +6,9 @@
 
 const { Contract } = require('fabric-contract-api');
 
-class QualityControlContract extends Contract {
+class AlertControlContract extends Contract {
     constructor() {
-        super('tsp.QualityControlContract');
+        super('tsp.AlertControlContract');
     }
 
     /**
@@ -114,14 +114,14 @@ class QualityControlContract extends Contract {
      * @param {string} actualValue The current value of the property, coming from the ProductContract.
      * @returns {string} Returns 'OK' if quality standards are met, or 'ALERT' if they are violated.
      */
-    async checkQuality(ctx, productId, propertyName, actualValue) {
-        console.log(`Checking quality for ${productId} - ${propertyName} with value ${actualValue}`);
+    async checkAlertRule(ctx, productId, propertyName, actualValue) {
+        console.log(`Checking alert for ${productId} - ${propertyName} with value ${actualValue}`);
 
         const ruleKey = ctx.stub.createCompositeKey('Rule', [productId, propertyName]);
         const ruleJSON = await ctx.stub.getState(ruleKey);
 
         if (!ruleJSON || ruleJSON.length === 0) {
-            console.log(`No quality rule found for ${productId} - ${propertyName}. Skipping check.`);
+            console.log(`No alert rule found for ${productId} - ${propertyName}. Skipping check.`);
             return 'NO_RULE';
         }
 
@@ -159,7 +159,7 @@ class QualityControlContract extends Contract {
         }
 
         if (violation) {
-            console.error('Quality violation detected!');
+            console.error(`Rule violation detected for ${productId} - ${propertyName}!`);
             const alertPayload = {
                 productId: productId,
                 propertyName: propertyName,
@@ -169,14 +169,14 @@ class QualityControlContract extends Contract {
             };
 
             // Emits an alert event for off-chain applications
-            ctx.stub.setEvent('QualityAlert', Buffer.from(JSON.stringify(alertPayload)));
-            console.log('QualityAlert event emitted.');
-            return 'ALERT';
+            ctx.stub.setEvent('Alert', Buffer.from(JSON.stringify(alertPayload)));
+            console.error(`Alert: ${rule.alertMessage}`);
+            return rule.alertMessage;
         }
 
-        console.log('Quality check passed.');
+        console.log('Rule check passed.');
         return 'OK';
     }
 }
 
-module.exports = QualityControlContract;
+module.exports = AlertControlContract;

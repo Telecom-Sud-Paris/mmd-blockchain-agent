@@ -15,7 +15,7 @@ const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
-const chaincodeName = 'qualitycontrol';
+const chaincodeName = 'alertcontrol';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUserRules';
@@ -45,8 +45,8 @@ async function main() {
             
         console.log('Fabric connection successful. Contract object is ready.');
 
-        console.log('Reading quality rules from quality-rules.yaml...');
-        const fileContents = fs.readFileSync(path.join(__dirname, 'quality-rules.yaml'), 'utf8');
+        console.log('Reading alert rules from alert-rules.yaml...');
+        const fileContents = fs.readFileSync(path.join(__dirname, 'alert-rules.yaml'), 'utf8');
         const data = yaml.load(fileContents);
 
         for (const product of data) {
@@ -66,10 +66,10 @@ async function main() {
         }
 
         gateway.disconnect();
-        console.log('\nAll quality rules loaded successfully.');
+        console.log('\nAll alert rules loaded successfully.');
 
     } catch (error) {
-        console.error(`Failed to load quality rules: ${error}`);
+        console.error(`Failed to load alert rules: ${error}`);
         process.exit(1);
     }
 }

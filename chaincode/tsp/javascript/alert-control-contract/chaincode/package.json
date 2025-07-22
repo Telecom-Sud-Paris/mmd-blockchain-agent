@@ -1,8 +1,8 @@
 {
-  "name": "quality-control-contract",
+  "name": "alert-control-contract",
   "version": "1.0.0",
-  "description": "The MoreMedDiet Quality Control contract in Javascript",
-  "main": "QualityControlContract.js",
+  "description": "The MoreMedDiet Alert Control contract in Javascript",
+  "main": "AlertControlContract.js",
   "engines": {
     "node": ">=12",
     "npm": ">=5"

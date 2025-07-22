@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'product';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUserListener';
+const org1UserId = 'test1';
 
 
 function prettyJSONString(inputString) {
@@ -59,16 +59,6 @@ async function main() {
 
     
 
-    try {
-        
-        const commit = await contract.submitTransaction(
-            'queryAllProducts'
-        )
-        console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
-
-    } catch (error) {
-        console.error('Failed to submit transaction:', error);
-    }
     
 
     
