@@ -28,7 +28,7 @@ fun ApplicationConfig.toClientWithTopics() = ClientConfig(
     password = requiredProperty("password")
 )
 
-private fun ApplicationConfig.requiredProperty(name: String) = requireNotNull(propertyOrNull(name)) {
+fun ApplicationConfig.requiredProperty(name: String) = requireNotNull(propertyOrNull(name)) {
     "Configuration property '$name' is missing"
 }.getString()
 
