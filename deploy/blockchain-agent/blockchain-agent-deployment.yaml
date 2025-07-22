@@ -20,6 +20,9 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            # === CA ===
+            - name: HYPERLEDGER_CA_ADDRESS
+              value: "ca.supplychain-net.svc.cluster.local:7054"
             # === Gateway A ===
             - name: GATEWAY_A_HOST
               value: "mosquitto1.supplychain-net.svc.cluster.local"
