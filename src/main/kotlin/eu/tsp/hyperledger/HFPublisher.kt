@@ -74,9 +74,9 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
             return
         }
 
-        val adminIdentity = wallet["admin"] as X509Identity
+        val adminIdentity = wallet["supplychain-admin"] as X509Identity
         val admin: User = object : User {
-            override fun getName(): String = "admin"
+            override fun getName(): String = "supplychain-admin"
             override fun getRoles(): Set<String>? = null
             override fun getAccount(): String? = null
             override fun getAffiliation(): String =  "org1.department1"
@@ -121,7 +121,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
 
         // Check to see if we've already enrolled the admin user.
-        if (wallet["admin"] != null) {
+        if (wallet["supplychain-admin"] != null) {
             println("An identity for the admin user \"admin\" already exists in the wallet")
             return
         }
@@ -130,9 +130,9 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         val enrollmentRequestTLS = EnrollmentRequest()
         enrollmentRequestTLS.addHost(clientConfig.caAddress)
         enrollmentRequestTLS.profile = "tls"
-        val enrollment = caClient.enroll("admin", "adminpw", enrollmentRequestTLS)
+        val enrollment = caClient.enroll("supplychain-admin", "supplychain-adminpw", enrollmentRequestTLS)
         val user: Identity = Identities.newX509Identity("Org1MSP", enrollment)
-        wallet.put("admin", user)
-        println("Successfully enrolled user \"admin\" and imported it into the wallet")
+        wallet.put("supplychain-admin", user)
+        println("Successfully enrolled user \"supplychain-admin\" and imported it into the wallet")
     }
 }
