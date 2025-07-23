@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'product';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUser';
+const org1UserId = 'testUser1';
 
 
 function prettyJSONString(inputString) {
@@ -50,8 +50,7 @@ async function main() {
 		
         console.log('Fabric connection successful. Contract object is ready.');
 
-        //await contract.submitTransaction('initLedger');
-        //console.log('Ledger initialized successfully.');
+        await contract.submitTransaction('queryAllProducts');
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);
@@ -60,16 +59,6 @@ async function main() {
 
     
 
-    try {
-        
-        const commit = await contract.submitTransaction(
-            'queryAllProducts'
-        )
-        console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
-
-    } catch (error) {
-        console.error('Failed to submit transaction:', error);
-    }
     
 
     
