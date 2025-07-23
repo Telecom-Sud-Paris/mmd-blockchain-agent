@@ -14,10 +14,9 @@ const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/j
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
-const chaincodeName = 'product';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUser';
+const org1UserId = 'appUserListener';
 
 // =========== config MQTT ===========
 const brokerUrl = 'mqtt://172.17.0.1:1883'; //gateway 1
@@ -28,7 +27,8 @@ function prettyJSONString(inputString) {
 }
 
 async function main() {
-    let contract;
+    let productContract;
+    let alertControlContract;
     let gateway;
 
 	try {
@@ -50,12 +50,11 @@ async function main() {
 		});
 
 		const network = await gateway.getNetwork(channelName);
-		contract = network.getContract(chaincodeName);
-		
+		productContract = network.getContract('product');
+        alertControlContract = network.getContract('alertcontrol');
+	
         console.log('Fabric connection successful. Contract object is ready.');
 
-        await contract.submitTransaction('initLedger');
-        console.log('Ledger initialized successfully.');
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);
@@ -100,7 +99,7 @@ async function main() {
             }
 
             console.log('Submitting transaction to create or update property...');
-            const commit = await contract.submitTransaction(
+            const commit = await productContract.submitTransaction(
                 'upsertProductProperty',
                 data.publisherId,
                 data.productId,
@@ -109,6 +108,16 @@ async function main() {
             );
             console.log(`*** Transaction committed successfully!`);
             console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
+
+
+            console.log("\n Checking alert rules for product...");
+            const rules = await alertControlContract.submitTransaction(
+                'checkAlertRule',
+                data.productId,
+                propertyName,
+                String(data.value)
+            );
+            console.log(`*** Alert check result: ${rules.toString()}`);
 
         } catch (error) {
             // do a retry logic here if needed

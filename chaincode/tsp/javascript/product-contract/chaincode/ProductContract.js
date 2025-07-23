@@ -23,6 +23,7 @@ class ProductContract extends Contract {
         // define unique namespace for this contract to avoid conflicts
         super('tsp.ProductContract');
     }
+    
     async initLedger(ctx) {
         console.log('============= START : Initialize Ledger ===========');
         console.log('============= END : Initialize Ledger ===========');
@@ -85,7 +86,7 @@ class ProductContract extends Contract {
         const eventPayload = Buffer.from(JSON.stringify(finalProperty));
         ctx.stub.setEvent(eventName, eventPayload);
 
-        console.log(`Upsert successful for: ${JSON.stringify(finalProperty)}`);
+        console.log(`Upsert successful for: ${JSON.stringify(finalProperty)}`); 
         console.log('============= END : upsertProductProperty ===========');
 
         return JSON.stringify(finalProperty);
