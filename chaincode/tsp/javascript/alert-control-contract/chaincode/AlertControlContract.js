@@ -25,7 +25,7 @@ class AlertControlContract extends Contract {
         console.log(`Setting rule for ${productId} - ${propertyName}`);
 
         const rule = {
-            docType: 'qualityRule',
+            docType: 'alertRule',
             productId,
             propertyName,
             condition,
@@ -107,15 +107,15 @@ class AlertControlContract extends Contract {
     }
 
     /**
-     * @dev Main verification function, invoked by the ProductContract.
+     * @dev Main verification function
      * @param {Context} ctx The transaction context.
      * @param {string} productId The product ID.
      * @param {string} propertyName The property name.
-     * @param {string} actualValue The current value of the property, coming from the ProductContract.
-     * @returns {string} Returns 'OK' if quality standards are met, or 'ALERT' if they are violated.
+     * @param {string} currentValue The current value of the property.
+     * @returns {string} Returns 'OK' if quality standards are met or AlertMessage if they are violated.
      */
-    async checkAlertRule(ctx, productId, propertyName, actualValue) {
-        console.log(`Checking alert for ${productId} - ${propertyName} with value ${actualValue}`);
+    async checkAlertRule(ctx, productId, propertyName, currentValue) {
+        console.log(`Checking alert for ${productId} - ${propertyName} with value ${currentValue}`);
 
         const ruleKey = ctx.stub.createCompositeKey('Rule', [productId, propertyName]);
         const ruleJSON = await ctx.stub.getState(ruleKey);
@@ -126,32 +126,32 @@ class AlertControlContract extends Contract {
         }
 
         const rule = JSON.parse(ruleJSON.toString());
-        const numericActualValue = parseFloat(actualValue);
+        const numericCurrentValue = parseFloat(currentValue);
 
-        if (isNaN(numericActualValue)) {
-            console.log(`Value ${actualValue} is not numeric. Skipping check.`);
+        if (isNaN(numericCurrentValue)) {
+            console.log(`Value ${currentValue} is not numeric. Skipping check.`);
             return 'INVALID_VALUE';
         }
 
         let violation = false;
         switch (rule.condition) {
             case 'equal':
-                violation = numericActualValue !== rule.value;
+                violation = numericCurrentValue !== rule.value;
                 break;
             case 'not_equal':
-                violation = numericActualValue === rule.value;
+                violation = numericCurrentValue === rule.value;
                 break;
             case 'less_than':
-                violation = numericActualValue >= rule.value;
+                violation = numericCurrentValue >= rule.value;
                 break;
             case 'greater_than':
-                violation = numericActualValue <= rule.value;
+                violation = numericCurrentValue <= rule.value;
                 break;
             case 'less_than_or_equal':
-                violation = numericActualValue > rule.value;
+                violation = numericCurrentValue > rule.value;
                 break;
             case 'greater_than_or_equal':
-                violation = numericActualValue < rule.value;
+                violation = numericCurrentValue < rule.value;
                 break;
             default:
                 console.log(`Unknown condition: ${rule.condition}. Skipping check.`);
@@ -163,7 +163,7 @@ class AlertControlContract extends Contract {
             const alertPayload = {
                 productId: productId,
                 propertyName: propertyName,
-                checkedValue: numericActualValue,
+                checkedValue: numericCurrentValue,
                 rule: rule,
                 timestamp: new Date(ctx.stub.getTxTimestamp().seconds.low * 1000).toISOString()
             };

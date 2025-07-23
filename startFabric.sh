@@ -28,21 +28,7 @@ cat <<EOF
 
 Total setup execution time : $(($(date +%s) - starttime)) secs ...
 
-Follow the instructions for the programming language of your choice:
+You can now use the Fabric SDKs to interact with the network.
 
-Java:
-
-  Start by changing into the "java" directory:
-    cd java
-
-  Then, install dependencies and run the test using:
-    mvn test
-
-  The test will invoke the sample client app which perform the following:
-    - Enroll admin and appUser and import them into the wallet (if they dont already exist there)
-    - Submit a transaction to create a new car
-    - Evaluate a transaction (query) to return details of this car
-    - Submit a transaction to change the owner of this car
-    - Evaluate a transaction (query) to return the updated details of this car
 EOF
 

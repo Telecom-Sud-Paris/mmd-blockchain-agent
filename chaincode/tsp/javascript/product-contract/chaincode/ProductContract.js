@@ -23,6 +23,7 @@ class ProductContract extends Contract {
         // define unique namespace for this contract to avoid conflicts
         super('tsp.ProductContract');
     }
+    
     async initLedger(ctx) {
         console.log('============= START : Initialize Ledger ===========');
         console.log('============= END : Initialize Ledger ===========');
