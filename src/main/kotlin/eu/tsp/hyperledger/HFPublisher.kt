@@ -113,7 +113,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         props["pemFile"] =
             "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
-        val caClient = HFCAClient.createNewInstance("https://${clientConfig.walletUsername}", props)
+        val caClient = HFCAClient.createNewInstance("https://${clientConfig.caAddress}", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
         caClient.cryptoSuite = cryptoSuite
 
