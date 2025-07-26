@@ -1,0 +1,35 @@
+name: Push Docker Image to Docker Hub
+
+on:
+  push:
+    branches:
+      - ci_cd_pipeline
+
+jobs:
+  push-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Push Docker image using jib
+        run: |
+          ./gradlew jib --image mmdtsp/mmd-blockchain-agent \
+            -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
+            -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Install Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: mmdtsp/mmd-blockchain-agent
+          format: table
+          exit-code: 0  # Change to 1 to fail build if critical/high vulnerabilities are found
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
