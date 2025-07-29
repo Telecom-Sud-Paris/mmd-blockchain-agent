@@ -13,10 +13,10 @@ const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/j
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
-const chaincodeName = 'product';
+const chaincodeName = 'honey';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'testUser1';
+const org1UserId = 'testUser3';
 
 
 function prettyJSONString(inputString) {
@@ -50,17 +50,13 @@ async function main() {
 		
         console.log('Fabric connection successful. Contract object is ready.');
 
-        let response=await contract.submitTransaction('queryAllProducts');
-		console.log(`Response from queryAllProducts: ${prettyJSONString(response.toString())}`);
+       	const response = await contract.submitTransaction('getPhaseStandard', 'honey', 'beekeeping');
+       	console.log(`Response from getPhaseStandard: ${prettyJSONString(response.toString())}`);
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);
         process.exit(1); 
 	}
-
-    
-
-    
 
     
     // --- disconnection ---

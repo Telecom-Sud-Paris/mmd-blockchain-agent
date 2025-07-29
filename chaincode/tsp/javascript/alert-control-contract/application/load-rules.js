@@ -10,8 +10,9 @@ const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
 const fs = require('fs');
 const yaml = require('js-yaml');
-const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js');
+const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js');
+
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
