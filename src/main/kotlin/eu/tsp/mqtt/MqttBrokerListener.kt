@@ -8,7 +8,7 @@ import mqtt.packets.mqtt.MQTTPublish
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 
-class MqttBrokerListener(config: ApplicationConfig) {
+class MqttBrokerListener(private val hfPublisher: HFPublisher, config: ApplicationConfig) {
 
     private val clients = config.configList("gateways").map {
         val configs = it.toClientWithTopics()
@@ -20,7 +20,6 @@ class MqttBrokerListener(config: ApplicationConfig) {
 
     //Publisher ID to MessageConsumer
     private val messageConsumers = mutableMapOf<String, MessageConsumer>()
-    private val hfPublisher = HFPublisher(config.config("hyperledger").toHyperledgerClientConfig()).apply { enrolUsers() }
     private val gson = Gson()
 
     fun initialize() {

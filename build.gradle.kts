@@ -21,10 +21,6 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
@@ -44,6 +40,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
     implementation("org.hyperledger.fabric:fabric-gateway-java:2.2.9")
+    implementation("org.hyperledger:anoncreds_uniffi:0.3.0-wrapper.0")
+    implementation("org.hyperledger:indy_vdr_uniffi:0.3.0-wrapper.0")
+    implementation("org.hyperledger:askar_uniffi:0.3.0-wrapper.0")
+    implementation("org.didcommx:peerdid:0.5.0")
 
     testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-tests-jvm")

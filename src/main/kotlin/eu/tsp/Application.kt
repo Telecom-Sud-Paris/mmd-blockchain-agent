@@ -1,5 +1,7 @@
 package eu.tsp
 
+import eu.tsp.hyperledger.HFPublisher
+import eu.tsp.hyperledger.toHyperledgerClientConfig
 import eu.tsp.mqtt.MqttBrokerListener
 import eu.tsp.plugins.configureCors
 import eu.tsp.plugins.configureSerialization
@@ -8,6 +10,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.swagger.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
@@ -23,14 +26,38 @@ fun Application.module() {
     configureCors()
     configureStatusPages()
     routing {
+        val config = environment.config
+        val hfPublisher = HFPublisher(config.config("hyperledger").toHyperledgerClientConfig()).apply {
+            enrolUsers()
+        }
+        val gatewayListener = MqttBrokerListener(hfPublisher, config)
+        gatewayListener.initialize()
+        route("$API_ROOT/publish") {
+            post {
+                val request = call.receive<DevicePayload>()
+
+                hfPublisher.publish(request.publisherId, request.batchId, request.property, request.value,)
+                call.respond(HttpStatusCode.OK, "Property published successfully")
+            }
+        }
         route("$API_ROOT/health") {
             get {
                 call.respond(HttpStatusCode.OK, "Status OK")
             }
         }
-        val gatewayListener = MqttBrokerListener(environment!!.config)
-        gatewayListener.initialize()
         swaggerUI(path = "$API_ROOT/swagger", swaggerFile = "openapi/documentation.yaml")
     }
 }
 
+data class DevicePayload(
+    val deviceId: String,
+    val ownerId: String,
+    val batchId: String,
+    val deviceType: String,
+    val property: String,
+    val value: String,
+    val timestamp: Long
+) {
+    val publisherId: String
+        get() = "$ownerId#$deviceId#$deviceType"
+}
