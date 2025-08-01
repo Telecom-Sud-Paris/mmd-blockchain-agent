@@ -39,13 +39,12 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         }
     }
 
-    fun publish(publisherId: String, productId: String, propertyName: String, value: String) {
+    fun publish(publisherId: String, productId: String, propertyName: String, value: String, timestamp: Long = System.currentTimeMillis()) {
         builder.connect().use { gateway ->
 
             // get the network and contract
             val network: Network = gateway.getNetwork("mychannel")
             val contract: Contract = network.getContract("PropertyContract")
-            val timestamp = System.currentTimeMillis()
 
             contract.submitTransaction("createOrUpdateProductProperty", productId, propertyName, value, timestamp.toString())
             val result = contract.evaluateTransaction("queryProductProperties", productId)
