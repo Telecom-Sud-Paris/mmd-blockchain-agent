@@ -21,9 +21,12 @@ jobs:
 
       - name: Push Docker image using jib
         run: |
-          ./gradlew jib --image mmdtsp/mmd-blockchain-agent \
+          ./gradlew jib \
+            --image mmdtsp/mmd-blockchain-agent \
             -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
-            -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
+            -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }} \
+            -DpersonalUser=${{ secrets.PERSONAL_USER }} \
+            -DpersonalPassword=${{ secrets.PERSONAL_PASSWORD }}
 
       - name: Install Trivy
         uses: aquasecurity/trivy-action@master
