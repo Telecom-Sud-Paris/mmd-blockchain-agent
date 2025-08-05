@@ -4,9 +4,8 @@ plugins {
 rootProject.name = "mmd-blockchain-agent"
 //include("chaincode")
 
-val personalUser: String? = settings.extra["personalUser"] as String?
-val personalPassword: String? = settings.extra["personalPassword"] as String?
-
+val personalUser: String by settings
+val personalPassword: String by settings
 
 dependencyResolutionManagement {
     repositories {
@@ -15,9 +14,9 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/LF-Decentralized-Trust-labs/aries-uniffi-wrappers")
             credentials {
-    username = personalUser ?: ""
-    password = personalPassword ?: ""
-}
+                username = System.getProperty("git.username") ?: personalUser
+                password = System.getProperty("git.password") ?: personalPassword
+            }
         }
         maven { url = uri("https://jitpack.io") }
     }
