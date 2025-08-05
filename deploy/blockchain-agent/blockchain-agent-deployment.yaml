@@ -50,3 +50,5 @@ spec:
         - name: ca-cert
           secret:
             secretName: blockchain-agent-ca-cert
+        - name: wallet-storage
+          emptyDir: {}
