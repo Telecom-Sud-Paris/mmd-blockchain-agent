@@ -14,8 +14,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/LF-Decentralized-Trust-labs/aries-uniffi-wrappers")
             credentials {
-                username = personalUser
-                password = personalPassword
+                username = System.getProperty("GIT_USERNAME") ?: personalUser
+                password = System.getProperty("GIT_PASSWORD") ?: personalPassword
             }
         }
         maven { url = uri("https://jitpack.io") }
