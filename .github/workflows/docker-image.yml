@@ -25,8 +25,8 @@ jobs:
             --image mmdtsp/mmd-blockchain-agent \
             -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} \
             -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }} \
-            -DpersonalUser=${{ secrets.PERSONAL_USER }} \
-            -DpersonalPassword=${{ secrets.PERSONAL_PASSWORD }}
+            -Dgit.username=${{ secrets.PERSONAL_USER }} \
+            -Dgit.password=${{ secrets.PERSONAL_PASSWORD }}
 
       - name: Install Trivy
         uses: aquasecurity/trivy-action@master
