@@ -47,7 +47,7 @@ spec:
               mountPath: /test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
               readOnly: true
             - name: wallet-storage
-              mountPath: wallet
+              mountPath: wallet/
       volumes:
         - name: ca-cert
           secret:
