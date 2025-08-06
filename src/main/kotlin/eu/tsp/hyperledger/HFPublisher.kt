@@ -98,18 +98,8 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         val registrationRequest = RegistrationRequest(clientConfig.walletUsername)
         registrationRequest.affiliation = "org1.department1"
         registrationRequest.enrollmentID = clientConfig.walletUsername
-        val enrollment: Enrollment = try {
-    val enrollmentSecret = caClient.register(registrationRequest, admin)
-    caClient.enroll(clientConfig.walletUsername, enrollmentSecret)
-} catch (e: org.hyperledger.fabric_ca.sdk.exception.RegistrationException) {
-    if (e.message?.contains("is already registered") == true) {
-        println("User ${clientConfig.walletUsername} is already registered. Trying to enroll with known password.")
-        caClient.enroll(clientConfig.walletUsername, "testUserPassword")  // 🔁 Put the real password here
-    } else {
-        throw e
-    }
-}
-
+        val enrollmentSecret = caClient.register(registrationRequest, admin)
+        val enrollment = caClient.enroll(clientConfig.walletUsername, enrollmentSecret)
         val user: Identity = Identities.newX509Identity("Org1MSP", enrollment)
         wallet.put(clientConfig.walletUsername, user)
         println("Successfully enrolled user ${clientConfig.walletUsername} and imported it into the wallet")
