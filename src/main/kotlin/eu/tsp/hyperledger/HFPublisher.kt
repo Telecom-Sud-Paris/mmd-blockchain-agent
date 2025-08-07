@@ -13,6 +13,9 @@ import java.security.PrivateKey
 import java.util.*
 
 class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
+    companion object {
+        private val WALLET_PATH = Paths.get("/wallet")
+    }
 
     init {
         System.setProperty("org.hyperledger.fabric.sdk.service_discovery.as_localhost", "false")
@@ -20,14 +23,9 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun enrolUsers() {
-//        enrolAdmin()
-//        enrolUser()
-    }
-
     private val builder by lazy {
         Gateway.createBuilder().apply {
-            val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
+            val wallet = Wallets.newFileSystemWallet(WALLET_PATH)
             val networkConfigPath = Paths.get(
                 "test-network",
                 "organizations",
@@ -39,17 +37,22 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         }
     }
 
+    fun enrolUsers() {
+        enrolAdmin()
+        enrolUser()
+    }
+
     fun publish(publisherId: String, productId: String, propertyName: String, value: String, timestamp: Long = System.currentTimeMillis()) {
-//        builder.connect().use { gateway ->
-//
-//            // get the network and contract
-//            val network: Network = gateway.getNetwork("mychannel")
-//            val contract: Contract = network.getContract("PropertyContract")
-//
-//            contract.submitTransaction("createOrUpdateProductProperty", productId, propertyName, value, timestamp.toString())
-//            val result = contract.evaluateTransaction("queryProductProperties", productId)
-//            logger.info("Ledger: ${String(result)}")
-//        }
+        builder.connect().use { gateway ->
+
+            // get the network and contract
+            val network: Network = gateway.getNetwork("mychannel")
+            val contract: Contract = network.getContract("PropertyContract")
+
+            contract.submitTransaction("createOrUpdateProductProperty", productId, propertyName, value, timestamp.toString())
+            val result = contract.evaluateTransaction("queryProductProperties", productId)
+            logger.info("Ledger: ${String(result)}")
+        }
     }
 
     private fun enrolUser() {
@@ -64,7 +67,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
 
 
         // Create a wallet for managing identities
-        val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
+        val wallet = Wallets.newFileSystemWallet(WALLET_PATH)
 
 
         // Check to see if we've already enrolled the user.
@@ -117,7 +120,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         caClient.cryptoSuite = cryptoSuite
 
         // Create a wallet for managing identities
-        val wallet = Wallets.newFileSystemWallet(Paths.get("wallet"))
+        val wallet = Wallets.newFileSystemWallet(WALLET_PATH)
 
         // Check to see if we've already enrolled the admin user.
         if (wallet["supplychain-admin"] != null) {
