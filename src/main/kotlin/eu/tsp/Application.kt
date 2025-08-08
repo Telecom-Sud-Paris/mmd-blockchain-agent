@@ -13,6 +13,7 @@ import io.ktor.server.plugins.swagger.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 
 fun main(args: Array<String>) {
     EngineMain.main(args)
@@ -49,6 +50,7 @@ fun Application.module() {
     }
 }
 
+@Serializable
 data class DevicePayload(
     val deviceId: String,
     val ownerId: String,
