@@ -59,7 +59,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
         // Create a CA client for interacting with the CA.
         val props = Properties()
         props["pemFile"] =
-            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
+            "/test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/..data/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
         val caClient = HFCAClient.createNewInstance("https://${clientConfig.caAddress}", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
@@ -113,7 +113,7 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
 
         val props = Properties()
         props["pemFile"] =
-            "test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/ca.org1.example.com-cert.pem"
+            "/test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem/..data/ca.org1.example.com-cert.pem"
         props["allowAllHostNames"] = "true"
         val caClient = HFCAClient.createNewInstance("https://${clientConfig.caAddress}", props)
         val cryptoSuite = CryptoSuiteFactory.getDefault().cryptoSuite
