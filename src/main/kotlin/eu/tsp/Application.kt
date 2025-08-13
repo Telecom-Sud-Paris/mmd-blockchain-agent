@@ -35,6 +35,7 @@ fun Application.module() {
         gatewayListener.initialize()
         route("$API_ROOT/publish") {
             post {
+                log.info("Received publish request")
                 val request = call.receive<DevicePayload>()
 
                 hfPublisher.publish(request.publisherId, request.batchId, request.property, request.value,)
@@ -43,6 +44,7 @@ fun Application.module() {
         }
         route("$API_ROOT/health") {
             get {
+                log.info("Received health request")
                 call.respond(HttpStatusCode.OK, "Status OK")
             }
         }
