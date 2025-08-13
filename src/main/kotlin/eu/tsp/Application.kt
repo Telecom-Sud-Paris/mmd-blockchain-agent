@@ -35,11 +35,14 @@ fun Application.module() {
         gatewayListener.initialize()
         route("$API_ROOT/publish") {
             post {
-                log.info("Received publish request")
-                val request = call.receive<DevicePayload>()
-
-                hfPublisher.publish(request.publisherId, request.batchId, request.property, request.value,)
-                call.respond(HttpStatusCode.OK, "Property published successfully")
+                try {
+                    val request = call.receive<DevicePayload>()
+                    log.info("Received publish request: $request")
+                    hfPublisher.publish(request.publisherId, request.batchId, request.property, request.value,)
+                    call.respond(HttpStatusCode.OK, "Property published successfully")
+                } catch (e: Exception) {
+                    log.error("Error publishing publish request: ${e.message}", e)
+                }
             }
         }
         route("$API_ROOT/health") {
