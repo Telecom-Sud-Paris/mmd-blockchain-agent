@@ -19,7 +19,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'alertcontrol';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'appUserRules';
+const org1UserId = 'appUserAlertRules';
 
 async function main() {
     let contract;

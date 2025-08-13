@@ -5,216 +5,214 @@
 'use strict';
 const { Contract } = require('fabric-contract-api');
 
-/**
- * Smart contract for managing honey standards based on ISO 15798:2001, ISO 5529:2001, ISO/TS 23401:2021, and ISO 21527-1:2008.
- */
 class StandardHoneyContract extends Contract {
     constructor() {
         super('utm.StandardHoneyContract');
-        this.standardCache = new Map();
-        this.cacheOrder = []; // Track insertion order for LRU cache
     }
 
     /**
-     * Initializes the honey standards registry on first deployment.
-     * @param {Context} ctx - The transaction context.
-     * @throws {Error} If the registry is already initialized or the client lacks admin privileges.
+     * Initializes the ledger with empty standards
+     * @param {Context} ctx The transaction context
+     * @returns {Object} Operation status
+     * @Transaction
      */
-    async init(ctx) {
-        // if (!ctx.clientIdentity.getAttributeValue('admin')) {
-        //     throw new Error('Only admins can initialize the standards registry');
-        // }
+    async initLedger(ctx) {
+        const txTimestamp = ctx.stub.getTxTimestamp();
+        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
+        const timestamp = date.toISOString();
 
-        const registryBytes = await ctx.stub.getState('standardsRegistry');
-        if (registryBytes && registryBytes.length > 0) {
-            throw new Error('Standards registry already initialized');
-        }
-
+        console.log('Initializing ledger with empty standards...');
         const standards = {
             productType: 'honey',
             version: '1.0.0',
-            phases: {
-                beekeeping: {
-                    pesticide_level: { max: 0.01, unit: 'mg/kg' }, // No specific ISO, general safety
-                    hive_health_score: { min: 80, max: 100, unit: 'score' }, // Custom metric
-                    origin_verification: { required: true } // ISO/TS 23401:2021
-                },
-                processing: {
-                    moisture_content: { max: 20, unit: '%' }, // ISO 5529:2001
-                    temperature: { max: 40, unit: '°C' }, // Prevent degradation
-                    filtration_quality: { required: true } // Custom processing standard
-                },
-                distribution: {
-                    storage_temperature: { min: 10, max: 25, unit: '°C' }, // Stability
-                    humidity: { max: 60, unit: '%' }, // Prevent moisture absorption
-                    origin_verification: { required: true } // ISO/TS 23401:2021
-                },
-                retailing: {
-                    packaging_integrity: { required: true }, // Ensure no contamination
-                    storage_temperature: { min: 10, max: 25, unit: '°C' },
-                    origin_verification: { required: true } // ISO/TS 23401:2021
-                },
-                final_product: {
-                    moisture_content: { max: 20, unit: '%' }, // ISO 5529:2001
-                    fructose_content: { min: 30, max: 50, unit: '%' }, // ISO 15798:2001
-                    glucose_content: { min: 25, max: 45, unit: '%' }, // ISO 15798:2001
-                    sucrose_content: { max: 5, unit: '%' }, // ISO 15798:2001
-                    microbial_count: { max: 1000, unit: 'CFU/g' }, // ISO 21527-1:2008
-                    origin_verification: { required: true } // ISO/TS 23401:2021
-                }
-            },
-            lastUpdated: new Date().toISOString()
+            phases: {},
+            lastUpdated: timestamp
         };
-
-        try {
-            await ctx.stub.putState('standardsRegistry', Buffer.from(JSON.stringify(standards)));
-            ctx.stub.setEvent('StandardsInitialized', Buffer.from(JSON.stringify({
-                productType: 'honey',
-                timestamp: standards.lastUpdated
-            })));
-        } catch (err) {
-            throw new Error(`Failed to initialize standards registry: ${err.message}`);
-        }
+        await ctx.stub.putState('standards', Buffer.from(JSON.stringify(standards)));
+        return { status: 'success', message: 'Empty standards initialized' };
     }
 
     /**
-     * Retrieves the standard for a specific phase of honey production.
-     * @param {Context} ctx - The transaction context.
-     * @param {string} productType - The type of product ('honey').
-     * @param {string} phase - The phase of production or 'final_product'.
-     * @returns {Object} The standard for the phase.
-     * @throws {Error} If the product type or phase is invalid or not found.
+     * Sets new standards or replaces existing ones
+     * @param {Context} ctx The transaction context
+     * @param {string} standardsJSON JSON string with the standards
+     * @returns {Object} Operation status with version
+     * @throws {Error} If standards are invalid
      */
-    async getPhaseStandard(ctx, productType, phase) {
-        if (typeof productType !== 'string' || typeof phase !== 'string') {
-            throw new Error('productType and phase must be strings');
-        }
-
-        if (productType !== 'honey') {
-            throw new Error('Unsupported product type');
-        }
-
-        const validPhases = ['beekeeping', 'processing', 'distribution', 'retailing', 'final_product'];
-        if (!validPhases.includes(phase)) {
-            throw new Error(`Invalid phase: ${phase}`);
-        }
-
-        const cacheKey = `${productType}_${phase}`;
-        if (this.standardCache.has(cacheKey)) {
-            return this.standardCache.get(cacheKey);
-        }
-
-        const standards = await this._getStandardsRegistry(ctx);
-        const phaseStandard = standards.phases[phase];
-
-        if (!phaseStandard) {
-            throw new Error(`No standard found for phase: ${phase}`);
-        }
-
-        if (this.standardCache.size >= 50) {
-            const oldestKey = this.cacheOrder.shift();
-            this.standardCache.delete(oldestKey);
-        }
-
-        this.standardCache.set(cacheKey, phaseStandard);
-        this.cacheOrder.push(cacheKey);
-
-        return phaseStandard;
-    }
-
-    /**
-     * Updates the standards registry with new or modified standards.
-     * @param {Context} ctx - The transaction context.
-     * @param {string} updatesJSON - JSON string of updates to standards.
-     * @returns {Object} Updated standards status.
-     * @throws {Error} If the client lacks admin privileges, updates are invalid, or state update fails.
-     */
-    async updateStandards(ctx, updatesJSON) {
-        // if (!ctx.clientIdentity.getAttributeValue('admin')) {
-        //     throw new Error('Only admins can update standards');
-        // }
-
-        let updates;
+    async setStandards(ctx, standardsJSON) {
+        let standards;
         try {
-            updates = JSON.parse(updatesJSON);
-        } catch (err) {
-            throw new Error(`Invalid updates JSON: ${err.message}`);
+            standards = JSON.parse(standardsJSON);
+        } catch (e) {
+            throw new Error('Invalid JSON format for standards');
+        }
+        
+        // Basic validation
+        if (!standards.productType || standards.productType !== 'honey') {
+            throw new Error('Invalid product type. Only "honey" is supported');
+        }
+        
+        if (!standards.version || !/^\d+\.\d+\.\d+$/.test(standards.version)) {
+            throw new Error('Invalid version format. Use semantic versioning (e.g. 1.0.0)');
+        }
+        
+        if (!standards.phases || typeof standards.phases !== 'object') {
+            throw new Error('Standards must contain phases object');
         }
 
-        if (typeof updates !== 'object' || updates === null || updates.productType !== 'honey') {
-            throw new Error('Invalid updates: must be an object with productType "honey"');
-        }
-
-        const standards = await this._getStandardsRegistry(ctx);
-        const validPhases = ['beekeeping', 'processing', 'distribution', 'retailing', 'final_product'];
-
-        if (updates.phases) {
-            for (const [phase, phaseStandards] of Object.entries(updates.phases)) {
-                if (!validPhases.includes(phase)) {
-                    throw new Error(`Invalid phase in updates: ${phase}`);
+        // Validate each phase structure
+        const validPhases = ['testing', 'beekeeping', 'processing', 'distribution', 'retailing', 'final_product'];
+        for (const phase of Object.keys(standards.phases)) {
+            if (!validPhases.includes(phase)) {
+                throw new Error(`Invalid phase: ${phase}. Valid phases are: ${validPhases.join(', ')}`);
+            }
+            
+            // Validate parameters in each phase
+            for (const [param, value] of Object.entries(standards.phases[phase])) {
+                if (param === 'origin_verification' || param === 'filtration_quality' || param === 'packaging_integrity') {
+                    if (typeof value.required !== 'boolean') {
+                        throw new Error(`Parameter ${phase}.${param} must have a boolean 'required' field`);
+                    }
+                } else {
+                    if (typeof value !== 'object' || value === null) {
+                        throw new Error(`Parameter ${phase}.${param} must be an object with value specifications`);
+                    }
+                    
+                    if (value.min !== undefined && typeof value.min !== 'number') {
+                        throw new Error(`Parameter ${phase}.${param}.min must be a number`);
+                    }
+                    
+                    if (value.max !== undefined && typeof value.max !== 'number') {
+                        throw new Error(`Parameter ${phase}.${param}.max must be a number`);
+                    }
+                    
+                    if (!value.unit || typeof value.unit !== 'string') {
+                        throw new Error(`Parameter ${phase}.${param} must specify a unit`);
+                    }
                 }
-                if (typeof phaseStandards !== 'object' || phaseStandards === null) {
-                    throw new Error(`Invalid standards for phase: ${phase}`);
-                }
-                standards.phases[phase] = { ...standards.phases[phase], ...phaseStandards };
             }
         }
 
         standards.lastUpdated = new Date().toISOString();
-        standards.version = this._incrementVersion(standards.version);
-
-        try {
-            await ctx.stub.putState('standardsRegistry', Buffer.from(JSON.stringify(standards)));
-            ctx.stub.setEvent('StandardsUpdated', Buffer.from(JSON.stringify({
-                productType: 'honey',
-                version: standards.version,
-                timestamp: standards.lastUpdated
-            })));
-            this.standardCache.clear(); // Clear cache to ensure updated standards are used
-            this.cacheOrder = [];
-        } catch (err) {
-            throw new Error(`Failed to update standards registry: ${err.message}`);
-        }
-
-        return { status: 'SUCCESS', updated: standards };
-    } 
-
-    /**
-     * Retrieves the standards registry.
-     * @param {Context} ctx - The transaction context.
-     * @returns {Object} Standards registry.
-     * @throws {Error} If registry is not initialized or cannot be parsed.
-     * @private
-     */
-    async _getStandardsRegistry(ctx) {
-        const registryBytes = await ctx.stub.getState('standardsRegistry');
-        if (!registryBytes || registryBytes.length === 0) {
-            throw new Error('Standards registry not initialized');
-        }
-        try {
-            return JSON.parse(registryBytes.toString());
-        } catch (err) {
-            throw new Error(`Failed to parse standards registry: ${err.message}`);
-        }
+        await ctx.stub.putState('standards', Buffer.from(JSON.stringify(standards)));
+        return { status: 'success', version: standards.version };
     }
 
-    /** 
-     * Increments the version number of the standards registry.
-     * @param {string} version - Current version (e.g., '1.0.0').
-     * @returns {string} Incremented version.
+    /**
+     * Updates a specific standard parameter
+     * @param {Context} ctx The transaction context
+     * @param {string} phase The phase to update (e.g., 'beekeeping')
+     * @param {string} parameter The parameter to update (e.g., 'pesticide_level')
+     * @param {string} newValueJSON JSON string with the new value
+     * @returns {Object} Operation status
+     * @throws {Error} If standard not found or update is invalid
+     */
+    async updateStandard(ctx, phase, parameter, newValueJSON) {
+        let newValue;
+        try {
+            newValue = JSON.parse(newValueJSON);
+        } catch (e) {
+            throw new Error('Invalid JSON format for new value');
+        }
+
+        const standards = JSON.parse(await this._getStandards(ctx));
+        
+        if (!standards.phases[phase]) {
+            throw new Error(`Phase not found: ${phase}`);
+        }
+        
+        if (!standards.phases[phase][parameter]) {
+            throw new Error(`Parameter not found: ${phase}.${parameter}`);
+        }
+
+        // Validate the new value structure matches the existing one
+        const existing = standards.phases[phase][parameter];
+        if (typeof existing !== typeof newValue) {
+            throw new Error(`Type mismatch for ${phase}.${parameter}`);
+        }
+
+        if (typeof existing === 'object' && existing !== null) {
+            // For object parameters, validate structure
+            if (existing.required !== undefined && newValue.required === undefined) {
+                throw new Error(`Must specify 'required' for ${phase}.${parameter}`);
+            }
+            
+            if (existing.min !== undefined && newValue.min === undefined) {
+                throw new Error(`Must specify 'min' for ${phase}.${parameter}`);
+            }
+            
+            if (existing.max !== undefined && newValue.max === undefined) {
+                throw new Error(`Must specify 'max' for ${phase}.${parameter}`);
+            }
+            
+            if (existing.unit && !newValue.unit) {
+                throw new Error(`Must specify 'unit' for ${phase}.${parameter}`);
+            }
+        }
+
+        standards.phases[phase][parameter] = {
+            ...existing,
+            ...newValue
+        };
+        standards.version = this._incrementVersion(standards.version);
+        standards.lastUpdated = new Date().toISOString();
+
+        await ctx.stub.putState('standards', Buffer.from(JSON.stringify(standards)));
+        return { 
+            status: 'success', 
+            updated: `${phase}.${parameter}`,
+            newVersion: standards.version
+        };
+    }
+
+    /**
+     * Gets all standards
+     * @param {Context} ctx The transaction context
+     * @returns {string} JSON string with all standards
+     * @throws {Error} If standards are not initialized
+     */
+    async getStandards(ctx) {
+        return await this._getStandards(ctx);
+    }
+
+    /**
+     * Gets standards for a specific phase
+     * @param {Context} ctx The transaction context
+     * @param {string} phase The phase to retrieve
+     * @returns {Object} Standards for the requested phase
+     * @throws {Error} If phase not found
+     */
+    async getPhaseStandard(ctx, phase) {
+        const standards = JSON.parse(await this._getStandards(ctx));
+        if (!standards.phases[phase]) {
+            throw new Error(`No standards defined for phase: ${phase}`);
+        }
+        return standards.phases[phase];
+    }
+
+    // Helper methods
+
+    /**
+     * Internal method to get standards from ledger
      * @private
      */
-    _incrementVersion(version) {
-        const parts = version.split('.').map(Number);
-        parts[2]++;
-        if (parts[2] >= 100) {
-            parts[2] = 0;
-            parts[1]++;
+    async _getStandards(ctx) {
+        const standards = await ctx.stub.getState('standards');
+        if (!standards || standards.length === 0) {
+            throw new Error('Standards not initialized. Call initLedger first.');
         }
-        if (parts[1] >= 100) {
-            parts[1] = 0;
-            parts[0]++;
-        }
+        return standards.toString();
+    }
+
+    /**
+     * Increments the version number
+     * @private
+     * @param {string} current Current version (e.g., '1.0.0')
+     * @returns {string} New version (e.g., '1.0.1')
+     */
+    _incrementVersion(current) {
+        const parts = current.split('.').map(Number);
+        parts[2] = (parts[2] || 0) + 1; // Increment patch version
         return parts.join('.');
     }
 }

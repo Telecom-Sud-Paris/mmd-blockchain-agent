@@ -15,7 +15,6 @@ const { Contract } = require('fabric-contract-api');
  *
  * Each property is uniquely identified by the combination of:
  * - Product ID
- * - Phase
  * - Property Name
  * - Publisher ID
  */
@@ -33,15 +32,13 @@ class ProductContract extends Contract {
             {
                 productId: 'honey',
                 properties: [
-                    { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'humidity', propertyValue: '18.5' },
-                    { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'color', propertyValue: 'light-amber' },
-                    { publisherId: 'Transporter', phase: 'testing', propertyName: 'temperature', propertyValue: '20.5' },
-                    { publisherId: 'Transporter', phase: 'testing', propertyName: 'humidity', propertyValue: '50' }
+                    { publisherId: 'Transporter', propertyName: 'temperature', propertyValue: '20.5' },
+                    { publisherId: 'Transporter', propertyName: 'humidity', propertyValue: '60%' }
                 ]
             }]
         for (const product of products) {
             for (const property of product.properties) {
-                await this.upsertProductProperty(ctx, property.publisherId, product.productId, property.phase, property.propertyName, property.propertyValue);
+                await this.upsertProductProperty(ctx, property.publisherId, product.productId, property.propertyName, property.propertyValue);
             }
         }
 
@@ -52,23 +49,23 @@ class ProductContract extends Contract {
     // managing functions
 
     /**
-    * @dev Creates a new product property or updates it if it already exists for a specific publisher and phase.
+    * @dev Creates a new product property or updates it if it already exists for a specific publisher.
     * @param {Context} ctx The transaction context.
     * @param {string} publisherId The ID of the entity publishing the property (e.g., 'Transporter').
-    * @param {string} productId The ID of the product the property refers to (e.g., 'honey-lot-001').
-    * @param {string} phase The supply chain phase this property relates to (e.g., 'processing'). // <-- MUDANÇA
+    * @param {string} productId The ID of the product the property refers to (e.g., 'fish').
     * @param {string} propertyName The name of the property (e.g., 'temperature').
     * @param {string} propertyValue The new or initial value for the property (e.g., '16.5').
     * @returns {string} The created or updated property object in JSON format.
     */
-    async upsertProductProperty(ctx, publisherId, productId, phase, propertyName, propertyValue) { // <-- MUDANÇA
+    async upsertProductProperty(ctx, publisherId, productId, propertyName, propertyValue) {
         console.log('============= START : upsertProductProperty ===========');
 
-        if (!publisherId || !productId || !phase || !propertyName || !propertyValue) {
-            throw new Error('publisherId, productId, phase, propertyName, and propertyValue cannot be empty.');
+
+        if (!publisherId || !productId || !propertyName || !propertyValue) {
+            throw new Error('publisherId, productId, propertyName, and propertyValue cannot be empty.');
         }
-      
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
+        // uniquely identifies the property for a specific product and publisher
+        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
         const txTimestamp = ctx.stub.getTxTimestamp();
         const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
         const timestamp = date.toISOString();
@@ -81,23 +78,23 @@ class ProductContract extends Contract {
         if (existingPropertyBuffer && existingPropertyBuffer.length > 0) {
             console.log(`Property found for key ${compositeKey}. Updating...`);
             const existingProperty = JSON.parse(existingPropertyBuffer.toString('utf8'));
+            // Update the value and timestamp
             existingProperty.propertyValue = propertyValue;
             existingProperty.lastUpdated = timestamp;
             finalProperty = existingProperty;
-            eventName = 'PropertyUpdated';
+            eventName = 'PropertyUpdated'; // Set event for an update
         } else {
             console.log(`Property not found for key ${compositeKey}. Creating new one...`);
             const newProperty = {
                 docType: 'productProperty',
                 publisherId: publisherId,
                 productId: productId,
-                phase: phase, 
                 propertyName: propertyName,
                 propertyValue: propertyValue,
                 lastUpdated: timestamp,
             };
             finalProperty = newProperty;
-            eventName = 'PropertyCreated';
+            eventName = 'PropertyCreated'; // Set event for a creation
         }
 
         const finalPropertyBuffer = Buffer.from(JSON.stringify(finalProperty));
@@ -118,66 +115,43 @@ class ProductContract extends Contract {
      * @param {Context} ctx The transaction context.
      * @param {string} publisherId The ID of the property's publisher.
      * @param {string} productId The product's ID.
-     * @param {string} phase The supply chain phase. // <-- MUDANÇA
      * @param {string} propertyName The name of the property.
      */
-    async deleteProductProperty(ctx, publisherId, productId, phase, propertyName) { // <-- MUDANÇA
+    async deleteProductProperty(ctx, publisherId, productId, propertyName) {
         console.log('============= START : deleteProductProperty ===========');
 
-        // <-- MUDANÇA: Chave composta agora inclui a fase
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
+        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
         const propertyExists = await ctx.stub.getState(compositeKey);
 
         if (!propertyExists || propertyExists.length === 0) {
-            throw new Error(`The property ${propertyName} for product ${productId} in phase ${phase} from publisher ${publisherId} was not found.`);
+            throw new Error(`The property ${propertyName} for product ${productId} from publisher ${publisherId} was not found.`);
         }
 
         await ctx.stub.deleteState(compositeKey);
         
-        const eventPayload = Buffer.from(JSON.stringify({ publisherId, productId, phase, propertyName, status: 'deleted' }));
+        const eventPayload = Buffer.from(JSON.stringify({ publisherId, productId, propertyName, status: 'deleted' }));
         ctx.stub.setEvent('PropertyDeleted', eventPayload);
 
         console.log(`Property deleted successfully: ${compositeKey}`);
         console.log('============= END : deleteProductProperty ===========');
     }
 
-    // ... as outras funções (queryAllProducts, queryProductProperties) continuam funcionando como antes ...
-    // Elas vão simplesmente retornar as propriedades, que agora incluirão o campo "phase".
 
-    // O restante do código (queryAllProducts, queryProductProperties, getProductPropertyHistory, etc.)
-    // precisa ser atualizado para incluir a 'phase' se eles dependem da construção da chave composta.
-    
-    // Por exemplo, getProductPropertyHistory:
-    async getProductPropertyHistory(ctx, publisherId, productId, phase, propertyName) { // <-- MUDANÇA
-        console.log('============= START : getProductPropertyHistory ===========');
 
-        // <-- MUDANÇA
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
-        const resultsIterator = await ctx.stub.getHistoryForKey(compositeKey);
+    // Queries
 
-        const history = [];
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value) {
-                const record = {
-                    txId: result.value.tx_id,
-                    timestamp: result.value.timestamp.toDate().toISOString(),
-                    isDelete: result.value.is_delete,
-                    value: result.value.value.toString('utf8'),
-                };
-                history.push(record);
-            }
-            result = await resultsIterator.next();
-        }
-        await resultsIterator.close();
+    /**
+     * @dev Queries all properties associated with a specific product ID.
+     * Uses a partial composite key to find all records for the product.
+     * @param {Context} ctx The transaction context.
+     * @param {string} productId The ID of the product to be queried.
+     * @returns {string} A JSON object containing the all the products and their properties.
+     * If no properties are found, returns an empty array.
+     * @throws {Error} If the productId is not provided.
+     * @throws {Error} If no properties are found for the given productId.
+     */
 
-        console.log('============= END : getProductPropertyHistory ===========');
-        return JSON.stringify(history);
-    }
-    
-    // As funções de consulta não precisam de alteração no input, pois elas já buscam de forma ampla.
     async queryAllProducts(ctx) {
-        //...código original sem alterações...
         console.log('============= START : queryAllProducts ===========');
         const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', []);
         const products = new Map();
@@ -208,9 +182,16 @@ class ProductContract extends Contract {
         console.log('============= END : queryAllProducts ===========');
         return JSON.stringify(response);
     }
+    
+    /**     
+     * * @dev Queries all properties associated with a specific product ID.
+     * Uses a partial composite key to find all records for the product.
+     * @param {Context} ctx The transaction context
+     * @param {string} productId The ID of the product to be queried.
+     * @returns {string} A JSON object containing the product ID and its properties.
+     */
 
     async queryProductProperties(ctx, productId) {
-        //...código original sem alterações...
         console.log('============= START : queryProductProperties ===========');
 
         if (!productId) {
@@ -247,8 +228,67 @@ class ProductContract extends Contract {
         return JSON.stringify(response);
     }
 
-    // A função propertyNameExistsForProduct foi removida pois sua lógica ficou ambígua.
-    // Pode ser substituída por uma consulta mais específica se necessário.
+
+    // Util functions
+
+    /**
+     * @dev Retrieves the history of changes for a specific product property.
+     * @param {Context} ctx The transaction context.
+     * @param {string} publisherId The ID of the property's publisher.
+     * @param {string} productId The product's ID.
+     * @param {string} propertyName The name of the property.
+     * @returns {string} A JSON array of historical values for the property.
+     */
+    async getProductPropertyHistory(ctx, publisherId, productId, propertyName) {
+        console.log('============= START : getProductPropertyHistory ===========');
+
+        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
+        const resultsIterator = await ctx.stub.getHistoryForKey(compositeKey);
+
+        const history = [];
+        let result = await resultsIterator.next();
+        while (!result.done) {
+            if (result.value) {
+                const record = {
+                    txId: result.value.tx_id,
+                    timestamp: result.value.timestamp.toDate().toISOString(),
+                    isDelete: result.value.is_delete,
+                    value: result.value.value.toString('utf8'),
+                };
+                history.push(record);
+            }
+            result = await resultsIterator.next();
+        }
+        await resultsIterator.close();
+
+        console.log('============= END : getProductPropertyHistory ===========');
+        return JSON.stringify(history);
+    }
+
+    /**
+     * @dev Checks if a property name exists for a given product (regardless of publisher).
+     * @param {Context} ctx The transaction context.
+     * @param {string} productId The product's ID.
+     * @param {string} propertyName The name of the property to check.
+     * @returns {boolean} True if the property exists for the product, false otherwise.
+     */
+    async propertyNameExistsForProduct(ctx, productId, propertyName, publisherId) {
+        if (!productId || !propertyName || !publisherId) {
+            throw new Error('productId, propertyName and publisherId are required.');
+        }
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
+        let exists = false;
+        let result = await resultsIterator.next();
+        while (!result.done) {
+            if (result.value && result.value.value && result.value.value.length > 0) {
+                exists = true;
+                break;
+            }
+            result = await resultsIterator.next();
+        }
+        await resultsIterator.close();
+        return exists;
+    }
 }
 
 module.exports = ProductContract;

@@ -48,10 +48,11 @@ async function main() {
 		const network = await gateway.getNetwork(channelName);
 		contract = network.getContract(chaincodeName);
 		
-        console.log('Fabric connection successful. Contract object is ready.');
+        //console.log('Fabric connection successful. Contract object is ready.');
+		//await contract.submitTransaction('initLedger');
 
-        let response=await contract.submitTransaction('queryAllProducts');
-		console.log(`Response from queryAllProducts: ${prettyJSONString(response.toString())}`);
+        let response=await contract.submitTransaction('queryProductProperties', 'honey');
+		console.log(`Response: ${prettyJSONString(response.toString())}`);
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);

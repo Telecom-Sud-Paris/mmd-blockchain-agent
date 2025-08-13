@@ -19,9 +19,9 @@ class TraceabilityContract extends Contract {
      */
     async initLedger(ctx) {
         console.debug('Starting initLedger');
-        if (!ctx.clientIdentity.getAttributeValue('admin')) {
-            throw new Error('Only admins can initialize the ledger');
-        }
+        // if (!ctx.clientIdentity.getAttributeValue('admin')) {
+        //     throw new Error('Only admins can initialize the ledger');
+        // }
 
         const configBytes = await ctx.stub.getState('traceabilityConfig');
         if (configBytes && configBytes.length > 0) {

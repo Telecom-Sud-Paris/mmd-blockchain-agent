@@ -14,11 +14,12 @@
         "start": "fabric-chaincode-node start"
     },
     "engineStrict": true,
-    "author": "Hyperledger",
+    "author": "Igor Godinho Souza Braga",
     "license": "Apache-2.0",
     "dependencies": {
-        "fabric-contract-api": "^2.0.0",
-        "fabric-shim": "^2.0.0"
+        "fabric-contract-api": "~2.2",
+        "fabric-shim": "~2.2",
+        "uuid": "^8.3.2"
     },
     "devDependencies": {
         "chai": "^4.1.2",
@@ -27,23 +28,5 @@
         "nyc": "^14.1.1",
         "sinon": "^6.0.0",
         "sinon-chai": "^3.2.0"
-    },
-    "nyc": {
-        "exclude": [
-            "coverage/**",
-            "test/**",
-            "index.js",
-            ".eslintrc.js"
-        ],
-        "reporter": [
-            "text-summary",
-            "html"
-        ],
-        "all": true,
-        "check-coverage": true,
-        "statements": 100,
-        "branches": 100,
-        "functions": 100,
-        "lines": 100
     }
 }

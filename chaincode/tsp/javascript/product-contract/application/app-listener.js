@@ -104,8 +104,10 @@ async function main() {
                 'upsertProductProperty',
                 data.publisherId,
                 data.productId,
+                'testing', // assuming 'testing' phase for this example since nodered isnt passing phases yet
                 propertyName,
-                String(data.value)
+                String(data.value),
+                
             );
             console.log(`*** Transaction committed successfully!`);
             console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
