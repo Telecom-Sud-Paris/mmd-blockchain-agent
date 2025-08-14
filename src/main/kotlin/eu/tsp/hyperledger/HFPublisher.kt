@@ -45,7 +45,6 @@ class HFPublisher(private val clientConfig: HyperledgerClientConfig) {
 
     fun publish(publisherId: String, productId: String, propertyName: String, value: String, timestamp: Long = System.currentTimeMillis()) {
         builder.connect().use { gateway ->
-            logger.info("In the publish method")
             // get the network and contract
             val network: Network = gateway.getNetwork("mychannel")
             val contract: Contract = network.getContract("PropertyContract")
