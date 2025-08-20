@@ -16,7 +16,7 @@ class ProductContract extends Contract {
         const products = [
             {
                 productType: 'honey',
-                productId: 'lote-mel-001',
+                productId: 'honey-001',
                 properties: [
                     { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'humidity', propertyValue: '18.5' },
                     { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'color', propertyValue: 'light-amber' },
