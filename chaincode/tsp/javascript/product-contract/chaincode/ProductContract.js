@@ -167,7 +167,6 @@ class ProductContract extends Contract {
         return JSON.stringify(products);
     }
     
-    // Outras funções como delete e history podem ser adaptadas de forma similar, adicionando productType à chave.
 }
 
 module.exports = ProductContract;
