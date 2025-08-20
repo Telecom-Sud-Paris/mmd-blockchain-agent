@@ -19,7 +19,9 @@ const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUserHoneyStandard';
 
 function prettyJSONString(inputString) {
-	return JSON.stringify(JSON.parse(inputString), null, 2);
+    // Adiciona uma verificação para evitar erro se a entrada já for um objeto
+    const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
+    return JSON.stringify(obj, null, 2);
 }
 
 async function main() {
@@ -39,26 +41,29 @@ async function main() {
             discovery: { enabled: true, asLocalhost: true }
         });
 
-        console.log('Loading standards from honey-standards.yaml...');
+        const network = await gateway.getNetwork(channelName);
+        const contract = network.getContract(chaincodeName);
+
+        console.log('\n--> Submitting transaction: initLedger');
+        // A resposta de initLedger geralmente é um status, não um JSON complexo
+        await contract.submitTransaction('initLedger');
+        console.log('--> "initLedger" transaction has been submitted successfully.');
+
+        console.log('\nLoading standards from honey-standards.yaml...');
         const fileContents = fs.readFileSync(path.join(__dirname, 'honey-standards.yaml'), 'utf8');
         const standards = yaml.load(fileContents);
         
-        const network = await gateway.getNetwork(channelName);
-        const contract = network.getContract(chaincodeName);
-        
-        const init = await contract.submitTransaction('initLedger');
-		console.log(`Init Ledger Response: ${prettyJSONString(init.toString())}`);
-        
-        console.log('Submitting standards to blockchain...');
-        const response = await contract.submitTransaction(
+        console.log('\n--> Submitting transaction: setStandards');
+        const responseBuffer = await contract.submitTransaction(
             'setStandards', 
             JSON.stringify(standards)
         );
         
-        console.log('Standards successfully loaded:', response.toString());
+        console.log('\nStandards successfully loaded. Response:');
+        console.log(prettyJSONString(responseBuffer.toString()));
 
     } catch (error) {
-        console.error('Failed to load standards:', error);
+        console.error('\nFailed to load standards:', error);
         process.exit(1);
     } finally {
         if (gateway) {

@@ -6,249 +6,168 @@
 
 const { Contract } = require('fabric-contract-api');
 
-/**
- * ProductContract
- *
- * A smart contract that manages properties associated with products in a supply chain.
- * It allows different publishers (such as transporters or food producers),
- * to register and update data (properties) about products, like temperature, location, etc.
- *
- * Each property is uniquely identified by the combination of:
- * - Product ID
- * - Phase
- * - Property Name
- * - Publisher ID
- */
 class ProductContract extends Contract {
     constructor() {
-        // define unique namespace for this contract to avoid conflicts
         super('tsp.ProductContract');
     }
     
     async initLedger(ctx) {
-        console.log('============= START : Initialize Ledger ===========');
-        // init ledger with honey products
-        
+        console.info('============= START : Initialize Ledger ===========');
         const products = [
             {
-                productId: 'honey',
+                productType: 'honey',
+                productId: 'lote-mel-001',
                 properties: [
                     { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'humidity', propertyValue: '18.5' },
                     { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'color', propertyValue: 'light-amber' },
                     { publisherId: 'Transporter', phase: 'testing', propertyName: 'temperature', propertyValue: '20.5' },
                     { publisherId: 'Transporter', phase: 'testing', propertyName: 'humidity', propertyValue: '50' }
                 ]
-            }]
+            }
+        ];
+
         for (const product of products) {
             for (const property of product.properties) {
-                await this.upsertProductProperty(ctx, property.publisherId, product.productId, property.phase, property.propertyName, property.propertyValue);
+                console.info(`  -> Initializing property: ${product.productId} / ${property.phase} / ${property.propertyName}`);
+                await this.upsertProductProperty(ctx, product.productType, product.productId, property.phase, property.propertyName, property.publisherId, property.propertyValue);
             }
         }
-
-        console.log('============= END : Initialize Ledger ===========');
+        console.info('============= END : Initialize Ledger ===========');
     }
 
+    async upsertProductProperty(ctx, productType, productId, phase, propertyName, publisherId, propertyValue) {
+        console.info('============= START : upsertProductProperty ===========');
+        console.info(`Executing with args: ${productType}, ${productId}, ${phase}, ${propertyName}, ${publisherId}, ${propertyValue}`);
 
-    // managing functions
-
-    /**
-    * @dev Creates a new product property or updates it if it already exists for a specific publisher and phase.
-    * @param {Context} ctx The transaction context.
-    * @param {string} publisherId The ID of the entity publishing the property (e.g., 'Transporter').
-    * @param {string} productId The ID of the product the property refers to (e.g., 'honey-lot-001').
-    * @param {string} phase The supply chain phase this property relates to (e.g., 'processing'). // <-- MUDANÇA
-    * @param {string} propertyName The name of the property (e.g., 'temperature').
-    * @param {string} propertyValue The new or initial value for the property (e.g., '16.5').
-    * @returns {string} The created or updated property object in JSON format.
-    */
-    async upsertProductProperty(ctx, publisherId, productId, phase, propertyName, propertyValue) { // <-- MUDANÇA
-        console.log('============= START : upsertProductProperty ===========');
-
-        if (!publisherId || !productId || !phase || !propertyName || !propertyValue) {
-            throw new Error('publisherId, productId, phase, propertyName, and propertyValue cannot be empty.');
+        if (!productType || !publisherId || !productId || !phase || !propertyName || !propertyValue) {
+            throw new Error('productType, publisherId, productId, phase, propertyName, and propertyValue cannot be empty.');
         }
       
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
+        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productType, productId, phase, propertyName, publisherId]);
+        console.info(`Generated CompositeKey: ${compositeKey}`);
+
         const txTimestamp = ctx.stub.getTxTimestamp();
-        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
-        const timestamp = date.toISOString();
+        const timestamp = new Date(txTimestamp.seconds.low * 1000).toISOString();
 
-        const existingPropertyBuffer = await ctx.stub.getState(compositeKey);
+        const newProperty = {
+            docType: 'productProperty',
+            productType,
+            productId,
+            phase,
+            propertyName,
+            publisherId,
+            propertyValue,
+            lastUpdated: timestamp,
+        };
 
-        let finalProperty;
-        let eventName;
-
-        if (existingPropertyBuffer && existingPropertyBuffer.length > 0) {
-            console.log(`Property found for key ${compositeKey}. Updating...`);
-            const existingProperty = JSON.parse(existingPropertyBuffer.toString('utf8'));
-            existingProperty.propertyValue = propertyValue;
-            existingProperty.lastUpdated = timestamp;
-            finalProperty = existingProperty;
-            eventName = 'PropertyUpdated';
-        } else {
-            console.log(`Property not found for key ${compositeKey}. Creating new one...`);
-            const newProperty = {
-                docType: 'productProperty',
-                publisherId: publisherId,
-                productId: productId,
-                phase: phase, 
-                propertyName: propertyName,
-                propertyValue: propertyValue,
-                lastUpdated: timestamp,
-            };
-            finalProperty = newProperty;
-            eventName = 'PropertyCreated';
-        }
-
-        const finalPropertyBuffer = Buffer.from(JSON.stringify(finalProperty));
+        const finalPropertyBuffer = Buffer.from(JSON.stringify(newProperty));
         await ctx.stub.putState(compositeKey, finalPropertyBuffer);
+        console.info('Property successfully saved to ledger.');
 
-        const eventPayload = Buffer.from(JSON.stringify(finalProperty));
-        ctx.stub.setEvent(eventName, eventPayload);
+        const eventPayload = Buffer.from(JSON.stringify(newProperty));
+        ctx.stub.setEvent('PropertyUpserted', eventPayload);
+        console.info('Event "PropertyUpserted" emitted.');
 
-        console.log(`Upsert successful for: ${JSON.stringify(finalProperty)}`); 
-        console.log('============= END : upsertProductProperty ===========');
+        console.info(`Upsert successful for: ${JSON.stringify(newProperty)}`); 
+        console.info('============= END : upsertProductProperty ===========');
 
-        return JSON.stringify(finalProperty);
-    }
-
-
-    /**
-     * @dev Deletes a product property from the ledger.
-     * @param {Context} ctx The transaction context.
-     * @param {string} publisherId The ID of the property's publisher.
-     * @param {string} productId The product's ID.
-     * @param {string} phase The supply chain phase. // <-- MUDANÇA
-     * @param {string} propertyName The name of the property.
-     */
-    async deleteProductProperty(ctx, publisherId, productId, phase, propertyName) { // <-- MUDANÇA
-        console.log('============= START : deleteProductProperty ===========');
-
-        // <-- MUDANÇA: Chave composta agora inclui a fase
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
-        const propertyExists = await ctx.stub.getState(compositeKey);
-
-        if (!propertyExists || propertyExists.length === 0) {
-            throw new Error(`The property ${propertyName} for product ${productId} in phase ${phase} from publisher ${publisherId} was not found.`);
-        }
-
-        await ctx.stub.deleteState(compositeKey);
-        
-        const eventPayload = Buffer.from(JSON.stringify({ publisherId, productId, phase, propertyName, status: 'deleted' }));
-        ctx.stub.setEvent('PropertyDeleted', eventPayload);
-
-        console.log(`Property deleted successfully: ${compositeKey}`);
-        console.log('============= END : deleteProductProperty ===========');
-    }
-
-    // ... as outras funções (queryAllProducts, queryProductProperties) continuam funcionando como antes ...
-    // Elas vão simplesmente retornar as propriedades, que agora incluirão o campo "phase".
-
-    // O restante do código (queryAllProducts, queryProductProperties, getProductPropertyHistory, etc.)
-    // precisa ser atualizado para incluir a 'phase' se eles dependem da construção da chave composta.
-    
-    // Por exemplo, getProductPropertyHistory:
-    async getProductPropertyHistory(ctx, publisherId, productId, phase, propertyName) { // <-- MUDANÇA
-        console.log('============= START : getProductPropertyHistory ===========');
-
-        // <-- MUDANÇA
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, phase, propertyName, publisherId]);
-        const resultsIterator = await ctx.stub.getHistoryForKey(compositeKey);
-
-        const history = [];
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value) {
-                const record = {
-                    txId: result.value.tx_id,
-                    timestamp: result.value.timestamp.toDate().toISOString(),
-                    isDelete: result.value.is_delete,
-                    value: result.value.value.toString('utf8'),
-                };
-                history.push(record);
-            }
-            result = await resultsIterator.next();
-        }
-        await resultsIterator.close();
-
-        console.log('============= END : getProductPropertyHistory ===========');
-        return JSON.stringify(history);
+        return JSON.stringify(newProperty);
     }
     
-    // As funções de consulta não precisam de alteração no input, pois elas já buscam de forma ampla.
-    async queryAllProducts(ctx) {
-        //...código original sem alterações...
-        console.log('============= START : queryAllProducts ===========');
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', []);
-        const products = new Map();
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const propertyRecord = JSON.parse(result.value.value.toString('utf8'));
-                    const productId = propertyRecord.productId;
-                    if (!products.has(productId)) {
-                        products.set(productId, {
-                            productId: productId,
-                            properties: []
-                        });
-                    }
-                    products.get(productId).properties.push(propertyRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from property record:', err);
-                }
-            }
-            result = await resultsIterator.next();
-        }
-        await resultsIterator.close();
-        if (products.size === 0) {
-            console.warn('No products found in the ledger.');
-        }
-        const response = Array.from(products.values());
-        console.log('============= END : queryAllProducts ===========');
-        return JSON.stringify(response);
-    }
+    async queryProductProperties(ctx, productType, productId) {
+        console.info('============= START : queryProductProperties ===========');
+        console.info(`Querying for productType: ${productType}, productId: ${productId}`);
 
-    async queryProductProperties(ctx, productId) {
-        //...código original sem alterações...
-        console.log('============= START : queryProductProperties ===========');
-
-        if (!productId) {
-            throw new Error('The product ID is required for the query.');
+        if (!productType || !productId) {
+            throw new Error('The productType and productId are required for the query.');
         }
 
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productId]);
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType, productId]);
         const properties = [];
         
         let result = await resultsIterator.next();
         while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const propertyRecord = JSON.parse(result.value.value.toString('utf8'));
-                    properties.push(propertyRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from property record:', err);
-                }
+            if (result.value && result.value.value.toString()) {
+                properties.push(JSON.parse(result.value.value.toString('utf8')));
+            }
+            result = await resultsIterator.next();
+        }
+        await resultsIterator.close(); // Boa prática fechar o iterador
+
+        console.info(`Found ${properties.length} properties for this product.`);
+
+        const response = {
+            productType,
+            productId,
+            properties
+        };
+
+        console.info('Query successful. Returning response.');
+        console.info('============= END : queryProductProperties ===========');
+        return JSON.stringify(response);
+    }
+    
+    async queryProductByPhase(ctx, productType, productId, phase) { 
+        console.info('============= START : queryProductByPhase ===========');
+        console.info(`Querying for productType: ${productType}, productId: ${productId}, phase: ${phase}`);
+
+        if (!productType || !productId || !phase) {
+            throw new Error('productType, productId, and phase are required for the query.');
+        }
+
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType, productId, phase]);
+        const properties = [];
+        
+        let result = await resultsIterator.next();
+        while (!result.done) {
+            if (result.value && result.value.value.toString()) {
+                properties.push(JSON.parse(result.value.value.toString('utf8')));
             }
             result = await resultsIterator.next();
         }
         await resultsIterator.close();
-
-        if (properties.length === 0) {
-            console.warn(`No properties found for product with ID=${productId}`);
-        }
+        console.info(`Found ${properties.length} properties for this product in phase '${phase}'.`);
         
         const response = {
-            productId: productId,
-            properties: properties
+            productType,
+            productId,
+            phase,
+            properties
         };
-
-        console.log('============= END : queryProductProperties ===========');
+        
+        console.info('Query successful. Returning response.');
+        console.info('============= END : queryProductByPhase ===========');
         return JSON.stringify(response);
     }
 
-    // A função propertyNameExistsForProduct foi removida pois sua lógica ficou ambígua.
-    // Pode ser substituída por uma consulta mais específica se necessário.
+;
+
+    async getProductByType(ctx, productType) {
+        console.log('============= START : getProductByType ===========');      
+        if (!productType) {
+            throw new Error('productType is required for the query.');
+        }
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType]);
+        const products = [];
+        for await (const res of resultsIterator) {
+            const product = JSON.parse(res.value.toString('utf8'));
+            if (!products.some(p => p.productId === product.productId)) {
+                products.push({
+                    productType: product.productType,
+                    productId: product.productId,
+                    properties: []
+                });
+            }
+            products.find(p => p.productId === product.productId).properties.push(product);
+        }
+        if (products.length === 0) {
+            console.warn(`No products found for productType=${productType}`);
+        }
+        console.log('============= END : getProductByType ===========');
+        return JSON.stringify(products);
+    }
+    
+    // Outras funções como delete e history podem ser adaptadas de forma similar, adicionando productType à chave.
 }
 
 module.exports = ProductContract;

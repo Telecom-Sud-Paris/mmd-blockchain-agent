@@ -6,7 +6,6 @@
 
 ./network.sh deployCC -ccn qualityassurance -ccp ../chaincode/tsp/javascript/quality-assurance-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 
-
 export PATH=${PWD}/../bin:$PATH
 
 export FABRIC_CFG_PATH=$PWD/../config/

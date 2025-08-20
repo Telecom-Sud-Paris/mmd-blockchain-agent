@@ -20,61 +20,59 @@ const org1UserId = 'testUser1';
 
 
 function prettyJSONString(inputString) {
-	return JSON.stringify(JSON.parse(inputString), null, 2);
+    // Adiciona uma verificação para evitar erro se a entrada já for um objeto
+    const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
+    return JSON.stringify(obj, null, 2);
 }
 
 async function main() {
-    let contract;
-    let gateway;
+    let gateway; // Declarado aqui para ser acessível no bloco finally
 
-	try {
-		// Fabric network connection
-		console.log('Initializing Fabric connection...');
+    try {
+        // Fabric network connection
+        console.log('Initializing Fabric connection...');
 
-		const ccp = buildCCPOrg1();
-		const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
-		const wallet = await buildWallet(Wallets, walletPath);
+        const ccp = buildCCPOrg1();
+        const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
+        const wallet = await buildWallet(Wallets, walletPath);
 
-		await enrollAdmin(caClient, wallet, mspOrg1);
-		await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+        await enrollAdmin(caClient, wallet, mspOrg1);
+        await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
 
-		gateway = new Gateway();
-		await gateway.connect(ccp, {
-			wallet,
-			identity: org1UserId,
-			discovery: { enabled: true, asLocalhost: true }
-		});
+        gateway = new Gateway();
+        await gateway.connect(ccp, {
+            wallet,
+            identity: org1UserId,
+            discovery: { enabled: true, asLocalhost: true }
+        });
 
-		const network = await gateway.getNetwork(channelName);
-		contract = network.getContract(chaincodeName);
-		
-        //console.log('Fabric connection successful. Contract object is ready.');
-		//await contract.submitTransaction('initLedger');
-
-        let response=await contract.submitTransaction('queryProductProperties', 'honey');
-		console.log(`Response: ${prettyJSONString(response.toString())}`);
-
-	} catch (error) {
-		console.error(`******** FAILED to connect to Fabric network: ${error}`);
+        const network = await gateway.getNetwork(channelName);
+        const contract = network.getContract(chaincodeName);
+        console.log('Fabric connection successful. Contract object is ready.');
+        
+        console.log('\n--> Submitting transaction: initLedger');
+        await contract.submitTransaction('initLedger');
+        console.log('--> Transaction "initLedger" has been submitted');
+        
+        console.log('\n--> Evaluating transaction: queryProductProperties');
+        let response = await contract.evaluateTransaction('queryProductProperties', 'honey', 'lote-mel-001');
+        console.log('--> Transaction "queryProductProperties" has been evaluated');
+        
+        console.log(`\nResponse: ${prettyJSONString(response.toString())}`);
+        
+    } catch (error) {
+        console.error(`\n******** FAILED to run application: ${error}`);
+        if (error.stack) {
+            console.error(error.stack);
+        }
         process.exit(1); 
-	}
-
-    
-
-    
-
-    
-    // --- disconnection ---
-    const shutdown = async () => {
+    } finally {
+        // --- disconnection ---
         console.log('\nShutting down...');
         if (gateway) {
             gateway.disconnect();
         }
-        process.exit(0);
-    };
-
-    process.on('SIGINT', shutdown);
-    process.on('SIGTERM', shutdown);
+    }
 }
 
 main();

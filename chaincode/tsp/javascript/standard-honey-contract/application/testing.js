@@ -16,7 +16,7 @@ const channelName = 'mychannel';
 const chaincodeName = 'standardhoney';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'testUserHoneyStandard1';
+const org1UserId = 'testUserHoneyStandard';
 
 
 function prettyJSONString(inputString) {
@@ -49,10 +49,10 @@ async function main() {
 		contract = network.getContract(chaincodeName);
 		
         console.log('Fabric connection successful. Contract object is ready.');
-		// init = await contract.submitTransaction('initLedger');
+		//let init = await contract.submitTransaction('initLedger');
 		//console.log(`Init Ledger Response: ${prettyJSONString(init.toString())}`);
-		
-       	const response = await contract.submitTransaction('getStandards');
+
+       	const response = await contract.evaluateTransaction('getStandards');
        	console.log(`${prettyJSONString(response.toString())}`);
 
 	} catch (error) {

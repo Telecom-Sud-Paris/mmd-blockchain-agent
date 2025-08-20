@@ -43,6 +43,7 @@ class StandardHoneyContract extends Contract {
         let standards;
         try {
             standards = JSON.parse(standardsJSON);
+            console.log(`Setting new standards: ${JSON.stringify(standards)}`);
         } catch (e) {
             throw new Error('Invalid JSON format for standards');
         }
@@ -66,34 +67,15 @@ class StandardHoneyContract extends Contract {
             if (!validPhases.includes(phase)) {
                 throw new Error(`Invalid phase: ${phase}. Valid phases are: ${validPhases.join(', ')}`);
             }
+
             
-            // Validate parameters in each phase
-            for (const [param, value] of Object.entries(standards.phases[phase])) {
-                if (param === 'origin_verification' || param === 'filtration_quality' || param === 'packaging_integrity') {
-                    if (typeof value.required !== 'boolean') {
-                        throw new Error(`Parameter ${phase}.${param} must have a boolean 'required' field`);
-                    }
-                } else {
-                    if (typeof value !== 'object' || value === null) {
-                        throw new Error(`Parameter ${phase}.${param} must be an object with value specifications`);
-                    }
-                    
-                    if (value.min !== undefined && typeof value.min !== 'number') {
-                        throw new Error(`Parameter ${phase}.${param}.min must be a number`);
-                    }
-                    
-                    if (value.max !== undefined && typeof value.max !== 'number') {
-                        throw new Error(`Parameter ${phase}.${param}.max must be a number`);
-                    }
-                    
-                    if (!value.unit || typeof value.unit !== 'string') {
-                        throw new Error(`Parameter ${phase}.${param} must specify a unit`);
-                    }
-                }
-            }
         }
 
-        standards.lastUpdated = new Date().toISOString();
+        const txTimestamp = ctx.stub.getTxTimestamp();
+        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
+        const timestamp = date.toISOString();
+        standards.lastUpdated = timestamp;
+        console.log(`Standards set at ${timestamp}: ${JSON.stringify(standards)}`);
         await ctx.stub.putState('standards', Buffer.from(JSON.stringify(standards)));
         return { status: 'success', version: standards.version };
     }
@@ -109,6 +91,9 @@ class StandardHoneyContract extends Contract {
      */
     async updateStandard(ctx, phase, parameter, newValueJSON) {
         let newValue;
+        const txTimestamp = ctx.stub.getTxTimestamp();
+        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
+        const timestamp = date.toISOString();
         try {
             newValue = JSON.parse(newValueJSON);
         } catch (e) {
@@ -131,31 +116,12 @@ class StandardHoneyContract extends Contract {
             throw new Error(`Type mismatch for ${phase}.${parameter}`);
         }
 
-        if (typeof existing === 'object' && existing !== null) {
-            // For object parameters, validate structure
-            if (existing.required !== undefined && newValue.required === undefined) {
-                throw new Error(`Must specify 'required' for ${phase}.${parameter}`);
-            }
-            
-            if (existing.min !== undefined && newValue.min === undefined) {
-                throw new Error(`Must specify 'min' for ${phase}.${parameter}`);
-            }
-            
-            if (existing.max !== undefined && newValue.max === undefined) {
-                throw new Error(`Must specify 'max' for ${phase}.${parameter}`);
-            }
-            
-            if (existing.unit && !newValue.unit) {
-                throw new Error(`Must specify 'unit' for ${phase}.${parameter}`);
-            }
-        }
-
         standards.phases[phase][parameter] = {
             ...existing,
             ...newValue
         };
         standards.version = this._incrementVersion(standards.version);
-        standards.lastUpdated = new Date().toISOString();
+        standards.lastUpdated = timestamp;
 
         await ctx.stub.putState('standards', Buffer.from(JSON.stringify(standards)));
         return { 

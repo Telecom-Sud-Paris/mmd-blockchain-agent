@@ -73,7 +73,7 @@ async function main() {
                     productId,
                     phaseToVerify 
                 );
-                
+                console.log(resultBuffer.toString());
                 const result = JSON.parse(resultBuffer.toString());
 
                 console.log(`Verification result: ${result.status.toUpperCase()}`);
