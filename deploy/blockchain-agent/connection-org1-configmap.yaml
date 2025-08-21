@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connection-org1
+  namespace: supplychain-net
+data:
+  connection-org1.yaml: |
+    ---
+    name: test-network-org1
+    version: 1.0.0
+    client:
+      organization: Org1
+      connection:
+        timeout:
+          peer:
+            endorser: '300'
+    organizations:
+      Org1:
+        mspid: Org1MSP
+        peers:
+          - peer0.org1.example.com
+        certificateAuthorities:
+          - ca.org1.example.com
+    peers:
+      peer0.org1.example.com:
+        url: grpcs://peer0.supplychain-net.svc.cluster.local:7051
+        tlsCACerts:
+          pem: |
+            -----BEGIN CERTIFICATE-----
+            MIICHzCCAcWgAwIBAgIUB0VKy85Nj3kU9tzwfTE1Rq5/ME0wCgYIKoZIzj0EAwIw
+            XjELMAkGA1UEBhMCR0IxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9u
+            MRAwDgYDVQQKDAdPcmRlcmVyMRswGQYDVQQDDBJjYS5zdXBwbHljaGFpbi1uZXQw
+            HhcNMjUwNDA4MTIwNDIwWhcNMjgwMTI3MTIwNDIwWjBeMQswCQYDVQQGEwJHQjEP
+            MA0GA1UECAwGTG9uZG9uMQ8wDQYDVQQHDAZMb25kb24xEDAOBgNVBAoMB09yZGVy
+            ZXIxGzAZBgNVBAMMEmNhLnN1cHBseWNoYWluLW5ldDBZMBMGByqGSM49AgEGCCqG
+            SM49AwEHA0IABMtGYYT2U4BpYbGGXLsY23WvUMM5DIyyBsYOpee2dnoXES01zVrL
+            VV5AFwJYWloLAVr1m1rVB18pr3X64Uzadf2jYTBfMA8GA1UdEwEB/wQFMAMBAf8w
+            DgYDVR0PAQH/BAQDAgGmMB0GA1UdDgQWBBRTx2zRBzCMWBabF1/Xnm8tq9a4sjAd
+            BgNVHREEFjAUghJjYS5zdXBwbHljaGFpbi1uZXQwCgYIKoZIzj0EAwIDSAAwRQIh
+            ALchKQ/KBIUvgPgUaky06grhsqrl1p4d6bQ6tDnY+FoNAiAnJJTMRWUU/VzCFdZZ
+            mV9uVoTPavZVSfRTt9cZ60Dj+A==
+            -----END CERTIFICATE-----
+        grpcOptions:
+          ssl-target-name-override: peer0.org1.example.com
+          hostnameOverride: peer0.org1.example.com
+    orderers:
+      orderer1.org1.example.com:
+        url: grpcs://orderer1.supplychain-net.svc.cluster.local:7050
+        grpcOptions:
+          ssl-target-name-override: orderer1.org1.example.com
+          hostnameOverride: orderer1.org1.example.com
+        tlsCACerts:
+          pem: |
+            -----BEGIN CERTIFICATE-----
+            MIICHzCCAcWgAwIBAgIUB0VKy85Nj3kU9tzwfTE1Rq5/ME0wCgYIKoZIzj0EAwIw
+            XjELMAkGA1UEBhMCR0IxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9u
+            MRAwDgYDVQQKDAdPcmRlcmVyMRswGQYDVQQDDBJjYS5zdXBwbHljaGFpbi1uZXQw
+            HhcNMjUwNDA4MTIwNDIwWhcNMjgwMTI3MTIwNDIwWjBeMQswCQYDVQQGEwJHQjEP
+            MA0GA1UECAwGTG9uZG9uMQ8wDQYDVQQHDAZMb25kb24xEDAOBgNVBAoMB09yZGVy
+            ZXIxGzAZBgNVBAMMEmNhLnN1cHBseWNoYWluLW5ldDBZMBMGByqGSM49AgEGCCqG
+            SM49AwEHA0IABMtGYYT2U4BpYbGGXLsY23WvUMM5DIyyBsYOpee2dnoXES01zVrL
+            VV5AFwJYWloLAVr1m1rVB18pr3X64Uzadf2jYTBfMA8GA1UdEwEB/wQFMAMBAf8w
+            DgYDVR0PAQH/BAQDAgGmMB0GA1UdDgQWBBRTx2zRBzCMWBabF1/Xnm8tq9a4sjAd
+            BgNVHREEFjAUghJjYS5zdXBwbHljaGFpbi1uZXQwCgYIKoZIzj0EAwIDSAAwRQIh
+            ALchKQ/KBIUvgPgUaky06grhsqrl1p4d6bQ6tDnY+FoNAiAnJJTMRWUU/VzCFdZZ
+            mV9uVoTPavZVSfRTt9cZ60Dj+A==
+            -----END CERTIFICATE-----
+    certificateAuthorities:
+      ca.org1.example.com:
+        url: https://ca.supplychain-net.svc.cluster.local:7054
+        caName: ca-org1
+        tlsCACerts:
+          pem:
+            - |
+              -----BEGIN CERTIFICATE-----
+              MIICHzCCAcWgAwIBAgIUB0VKy85Nj3kU9tzwfTE1Rq5/ME0wCgYIKoZIzj0EAwIw
+              XjELMAkGA1UEBhMCR0IxDzANBgNVBAgMBkxvbmRvbjEPMA0GA1UEBwwGTG9uZG9u
+              MRAwDgYDVQQKDAdPcmRlcmVyMRswGQYDVQQDDBJjYS5zdXBwbHljaGFpbi1uZXQw
+              HhcNMjUwNDA4MTIwNDIwWhcNMjgwMTI3MTIwNDIwWjBeMQswCQYDVQQGEwJHQjEP
+              MA0GA1UECAwGTG9uZG9uMQ8wDQYDVQQHDAZMb25kb24xEDAOBgNVBAoMB09yZGVy
+              ZXIxGzAZBgNVBAMMEmNhLnN1cHBseWNoYWluLW5ldDBZMBMGByqGSM49AgEGCCqG
+              SM49AwEHA0IABMtGYYT2U4BpYbGGXLsY23WvUMM5DIyyBsYOpee2dnoXES01zVrL
+              VV5AFwJYWloLAVr1m1rVB18pr3X64Uzadf2jYTBfMA8GA1UdEwEB/wQFMAMBAf8w
+              DgYDVR0PAQH/BAQDAgGmMB0GA1UdDgQWBBRTx2zRBzCMWBabF1/Xnm8tq9a4sjAd
+              BgNVHREEFjAUghJjYS5zdXBwbHljaGFpbi1uZXQwCgYIKoZIzj0EAwIDSAAwRQIh
+              ALchKQ/KBIUvgPgUaky06grhsqrl1p4d6bQ6tDnY+FoNAiAnJJTMRWUU/VzCFdZZ
+              mV9uVoTPavZVSfRTt9cZ60Dj+A==
+              -----END CERTIFICATE-----
+        httpOptions:
+          verify: false
