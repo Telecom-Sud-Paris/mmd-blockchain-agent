@@ -41,14 +41,14 @@ data:
             mV9uVoTPavZVSfRTt9cZ60Dj+A==
             -----END CERTIFICATE-----
         grpcOptions:
-          ssl-target-name-override: peer0.org1.example.com
-          hostnameOverride: peer0.org1.example.com
+          ssl-target-name-override: peer0.supplychain-net.svc.cluster.local
+          hostnameOverride: peer0.supplychain-net.svc.cluster.local
     orderers:
       orderer1.org1.example.com:
         url: grpcs://orderer1.supplychain-net.svc.cluster.local:7050
         grpcOptions:
-          ssl-target-name-override: orderer1.org1.example.com
-          hostnameOverride: orderer1.org1.example.com
+          ssl-target-name-override: orderer1.supplychain-net.svc.cluster.local
+          hostnameOverride: orderer1.supplychain-net.svc.cluster.local
         tlsCACerts:
           pem: |
             -----BEGIN CERTIFICATE-----
