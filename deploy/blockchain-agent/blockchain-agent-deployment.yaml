@@ -48,9 +48,19 @@ spec:
               readOnly: true
             - name: wallet-storage
               mountPath: /wallet
+            - name: connection-profile
+              mountPath: /test-network/organizations/peerOrganizations/org1.example.com/connection-org1.yaml
+              subPath: connection-org1.yaml
+              readOnly: true  
       volumes:
         - name: ca-cert
           secret:
             secretName: blockchain-agent-ca-cert
         - name: wallet-storage
           emptyDir: {}
+        - name: connection-profile
+          configMap:
+            name: connection-org1
+            items:
+              - key: connection-org1.yaml
+                path: connection-org1.yaml  
