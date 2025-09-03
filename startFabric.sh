@@ -16,12 +16,12 @@ set -e
 
 # clean out any old identities in the wallets
 rm -rf wallet/*.id
+rm -rf chaincode/tsp/javascript/*/application/wallet/*.id
 
 # launch network; create channel and join peer to channel
 pushd ./test-network
 ./network.sh down
 ./network.sh up createChannel -ca -s couchdb
-#./network.sh deployCC -ccn PropertyContract -ccv 1 -cci initLedger -ccl ${CC_SRC_LANGUAGE} -ccp ${CC_SRC_PATH}
 popd
 
 cat <<EOF

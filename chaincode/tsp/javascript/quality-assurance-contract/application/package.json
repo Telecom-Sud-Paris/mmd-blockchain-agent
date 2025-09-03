@@ -1,0 +1,16 @@
+{
+    "name": "quality-assurance-contract",
+    "version": "1.0.0",
+    "description": "quality assurance implemented in JavaScript",
+    "engines": {
+        "node": ">=12",
+        "npm": ">=5"
+    },
+    "engineStrict": true,
+    "author": "Igor Godinho",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "fabric-ca-client": "^2.2.4",
+        "fabric-network": "^2.2.4"
+    }
+}

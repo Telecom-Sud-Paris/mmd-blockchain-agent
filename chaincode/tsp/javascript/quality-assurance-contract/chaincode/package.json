@@ -1,0 +1,32 @@
+{
+    "name": "quality-assurance-contract",
+    "version": "1.0.0",
+    "description": "Verify quality of products in the supply chain",
+    "main": "QualityAssuranceContract.js",
+    "engines": {
+        "node": ">=12",
+        "npm": ">=5"
+    },
+    "scripts": {
+        "lint": "eslint .",
+        "pretest": "npm run lint",
+        "test": "nyc mocha --recursive",
+        "start": "fabric-chaincode-node start"
+    },
+    "engineStrict": true,
+    "author": "Igor Godinho Souza Braga",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "fabric-contract-api": "~2.2",
+        "fabric-shim": "~2.2",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "chai": "^4.1.2",
+        "eslint": "^4.19.1",
+        "mocha": "^8.0.1",
+        "nyc": "^14.1.1",
+        "sinon": "^6.0.0",
+        "sinon-chai": "^3.2.0"
+    }
+}

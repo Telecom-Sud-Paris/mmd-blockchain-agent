@@ -13,7 +13,7 @@ const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/j
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
-const chaincodeName = 'qualitycontrol';
+const chaincodeName = 'alertcontrol';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'testUser2';
