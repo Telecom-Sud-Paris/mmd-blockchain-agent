@@ -16,7 +16,7 @@ set -e
 
 # clean out any old identities in the wallets
 rm -rf wallet/*.id
-rm -rf applications/javascript/*/wallet
+rm -rf chaincode/tsp/javascript/*/application/wallet/*.id
 
 # launch network; create channel and join peer to channel
 pushd ./test-network

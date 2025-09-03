@@ -17,8 +17,6 @@ phases:
       min: 80 
       max: 100 
       unit: 'score'
-    origin_verification: 
-      required: true
 
   processing:
     moisture_content: 

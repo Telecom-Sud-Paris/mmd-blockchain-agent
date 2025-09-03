@@ -18,8 +18,8 @@ class ProductContract extends Contract {
                 productType: 'honey',
                 productId: 'honey-001',
                 properties: [
-                    { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'humidity', propertyValue: '18.5' },
-                    { publisherId: 'Farmer', phase: 'harvesting', propertyName: 'color', propertyValue: 'light-amber' },
+                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'pesticide_level', propertyValue: '0.005' },
+                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'hive_health_score', propertyValue: '90' },
                     { publisherId: 'Transporter', phase: 'testing', propertyName: 'temperature', propertyValue: '20.5' },
                     { publisherId: 'Transporter', phase: 'testing', propertyName: 'humidity', propertyValue: '50' }
                 ]

@@ -54,6 +54,8 @@ async function main() {
 
        	const response = await contract.evaluateTransaction('getStandards');
        	console.log(`${prettyJSONString(response.toString())}`);
+		const phase = await contract.evaluateTransaction('getPhaseStandard', 'beekeeping');
+		console.log(`${prettyJSONString(phase.toString())}`);
 
 	} catch (error) {
 		console.error(`******** FAILED to connect to Fabric network: ${error}`);

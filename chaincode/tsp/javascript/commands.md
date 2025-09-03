@@ -1,6 +1,6 @@
-./network.sh deployCC -ccn product -ccp ../chaincode/tsp/javascript/product-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
-
 ./network.sh deployCC -ccn alertcontrol -ccp ../chaincode/tsp/javascript/alert-control-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
+
+./network.sh deployCC -ccn product -ccp ../chaincode/tsp/javascript/product-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 
 ./network.sh deployCC -ccn standardhoney -ccp ../chaincode/tsp/javascript/standard-honey-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 

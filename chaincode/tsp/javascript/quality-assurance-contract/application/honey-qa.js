@@ -16,7 +16,6 @@ const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUserHoneyQAFullProduct';
 
 function prettyJSONString(inputString) {
-    // Garante que a string de entrada é um objeto JSON antes de formatar
     const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
     return JSON.stringify(obj, null, 2);
 }
@@ -40,13 +39,12 @@ async function main() {
         });
 
         const network = await gateway.getNetwork(channelName);
-        
-        // Obter o productContract apenas para listar os produtos a serem verificados
+    
         const productContract = network.getContract('product'); 
         const qualityAssuranceContract = network.getContract('qualityassurance');
         
         const productTypeToVerify = 'honey';
-        const productIdToVerify = 'lote-mel-001';
+        const productIdToVerify = 'honey-001';
 
         console.log(`\n--> CONFIGURATION: Script will verify all phases for product: ${productTypeToVerify}:${productIdToVerify}`);
 
@@ -55,7 +53,6 @@ async function main() {
         console.log(`======================================================`);
 
         try {
-            // Chama a nova função que verifica todas as fases de uma vez
             const resultBuffer = await qualityAssuranceContract.submitTransaction(
                 'verifyProductCompliance',
                 productTypeToVerify,
