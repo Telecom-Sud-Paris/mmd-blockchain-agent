@@ -39,8 +39,7 @@ class QualityAssuranceContract extends Contract {
             console.info(`\n  ----- Verifying phase: ${phase} -----`);
             const result = await this.verifyPhaseCompliance(ctx, productType, productId, phase);
             verificationResults.push({ phase, ...result });
-            
-            
+               
             if (result.status === 'skipped') {
                 console.info(`  ----- Phase: ${phase} - SKIPPED: ${result.message} -----`);
             } else if (result.status === 'approved') {
@@ -102,7 +101,7 @@ class QualityAssuranceContract extends Contract {
         try {
             const response = await ctx.stub.invokeChaincode('standardhoney', ['getStandards'], 'mychannel');
             const standards = JSON.parse(response.payload.toString());
-            
+
             // check if phase exists and has parameters
             const hasStandards = !!(standards.phases && standards.phases[phase]);
             console.info(`      [_checkPhaseHasStandards] Phase '${phase}' has standards: ${hasStandards}`);
