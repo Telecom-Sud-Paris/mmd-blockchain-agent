@@ -56,7 +56,8 @@ async function main() {
             const resultBuffer = await qualityAssuranceContract.submitTransaction(
                 'verifyProductCompliance',
                 productTypeToVerify,
-                productIdToVerify 
+                productIdToVerify,
+                'standardhoney'  // Name of the Standards chaincode to invoke
             );
             
             const results = JSON.parse(resultBuffer.toString());

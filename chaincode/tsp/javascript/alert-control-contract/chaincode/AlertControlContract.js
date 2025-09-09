@@ -188,7 +188,6 @@ class AlertControlContract extends Contract {
                 timestamp: new Date(ctx.stub.getTxTimestamp().seconds.low * 1000).toISOString()
             };
 
-            // Emits an alert event for off-chain applications
             ctx.stub.setEvent('Alert', Buffer.from(JSON.stringify(alertPayload)));
             console.error(`Alert: ${rule.alertMessage}`);
             return rule.alertMessage;

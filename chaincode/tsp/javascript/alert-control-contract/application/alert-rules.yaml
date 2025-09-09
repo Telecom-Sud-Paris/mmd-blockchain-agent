@@ -71,4 +71,4 @@
     - propertyName: 'humidity'
       condition: 'less_than'
       value: 60
-      alertMessage: 'ALERT: Ambient humidity for honey is over 60%, risking moisture absorption!'
+      alertMessage: 'ALERT: Ambient humidity for honey is over 60%.'

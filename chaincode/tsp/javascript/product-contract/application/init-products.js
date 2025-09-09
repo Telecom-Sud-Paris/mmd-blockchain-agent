@@ -20,13 +20,12 @@ const org1UserId = 'testUser1';
 
 
 function prettyJSONString(inputString) {
-    // Adiciona uma verificação para evitar erro se a entrada já for um objeto
     const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
     return JSON.stringify(obj, null, 2);
 }
 
 async function main() {
-    let gateway; // Declarado aqui para ser acessível no bloco finally
+    let gateway;
 
     try {
         // Fabric network connection
@@ -55,7 +54,7 @@ async function main() {
         console.log('--> Transaction "initLedger" has been submitted');
         
         console.log('\n--> Evaluating transaction: queryProductProperties');
-        let response = await contract.evaluateTransaction('queryProductProperties', 'honey', 'lote-mel-001');
+        let response = await contract.evaluateTransaction('queryProductProperties', 'honey', 'honey-001');
         console.log('--> Transaction "queryProductProperties" has been evaluated');
         
         console.log(`\nResponse: ${prettyJSONString(response.toString())}`);

@@ -20,8 +20,11 @@ class ProductContract extends Contract {
                 properties: [
                     { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'pesticide_level', propertyValue: '0.005' },
                     { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'hive_health_score', propertyValue: '90' },
-                    { publisherId: 'Transporter', phase: 'testing', propertyName: 'temperature', propertyValue: '20.5' },
-                    { publisherId: 'Transporter', phase: 'testing', propertyName: 'humidity', propertyValue: '50' }
+                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'temperature', propertyValue: '20.5' },
+                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'humidity', propertyValue: '50' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'moisture_content', propertyValue: '21' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'temperature', propertyValue: '30' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'filtration_quality', propertyValue: 'true' },
                 ]
             }
         ];
@@ -64,6 +67,29 @@ class ProductContract extends Contract {
         await ctx.stub.putState(compositeKey, finalPropertyBuffer);
         console.info('Property successfully saved to ledger.');
 
+        // Invoke AlertControlContract to check for alerts
+        try {
+            console.info('Invoking AlertControlContract to check for alerts...');
+            const alertResponse = await ctx.stub.invokeChaincode(
+                'alertcontrol', 
+                ['checkAlertRule', productType, propertyName, propertyValue], 
+                'mychannel'
+            );
+            
+            if (alertResponse.status === 200) {
+                const alertResult = alertResponse.payload.toString();
+                console.info(`Alert check result: ${alertResult}`);
+                
+                if (alertResult !== 'OK' && alertResult !== 'NO_RULE' && alertResult !== 'INVALID_VALUE' && alertResult !== 'UNKNOWN_CONDITION') {
+                    console.warn(`ALERT DETECTED: ${alertResult}`);
+                }
+            } else {
+                console.error(`Failed to invoke AlertControlContract: ${alertResponse.message}`);
+            }
+        } catch (error) {
+            console.error(`Error invoking AlertControlContract: ${error.message}`);
+        }
+
         const eventPayload = Buffer.from(JSON.stringify(newProperty));
         ctx.stub.setEvent('PropertyUpserted', eventPayload);
         console.info('Event "PropertyUpserted" emitted.');
@@ -92,7 +118,7 @@ class ProductContract extends Contract {
             }
             result = await resultsIterator.next();
         }
-        await resultsIterator.close(); // Boa prática fechar o iterador
+        await resultsIterator.close();
 
         console.info(`Found ${properties.length} properties for this product.`);
 

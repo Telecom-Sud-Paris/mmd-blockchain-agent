@@ -62,7 +62,7 @@ class StandardHoneyContract extends Contract {
         }
 
         // Validate each phase structure
-        const validPhases = ['testing', 'beekeeping', 'processing', 'distribution', 'retailing', 'final_product'];
+        const validPhases = ['transportation', 'beekeeping', 'processing', 'distribution', 'retailing', 'final_product'];
         for (const phase of Object.keys(standards.phases)) {
             if (!validPhases.includes(phase)) {
                 throw new Error(`Invalid phase: ${phase}. Valid phases are: ${validPhases.join(', ')}`);

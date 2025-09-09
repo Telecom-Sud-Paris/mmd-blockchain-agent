@@ -11,7 +11,7 @@ class QualityAssuranceContract extends Contract {
         super('utm.QualityAssuranceContract');
     }
 
-    async verifyProductCompliance(ctx, productType, productId) {
+    async verifyProductCompliance(ctx, productType, productId, chaincodeName) {
         console.info(`\n============= START: Verifying all phases for product ${productType}:${productId} =============`);
 
         console.info('  -> Step 1: Invoking ProductContract to get all product properties.');
@@ -37,7 +37,7 @@ class QualityAssuranceContract extends Contract {
         console.info('  -> Step 3: Starting verification loop for each phase.');
         for (const phase of phases) {
             console.info(`\n  ----- Verifying phase: ${phase} -----`);
-            const result = await this.verifyPhaseCompliance(ctx, productType, productId, phase);
+            const result = await this.verifyPhaseCompliance(ctx, productType, productId, phase, chaincodeName);
             verificationResults.push({ phase, ...result });
                
             if (result.status === 'skipped') {
@@ -55,13 +55,13 @@ class QualityAssuranceContract extends Contract {
         return JSON.stringify(verificationResults);
     }
 
-    async verifyPhaseCompliance(ctx, productType, productId, phase) {
+    async verifyPhaseCompliance(ctx, productType, productId, phase, chaincodeName) {
         console.info(`    [verifyPhaseCompliance] START for phase '${phase}'`);
         const timestamp = new Date(ctx.stub.getTxTimestamp().seconds.low * 1000).toISOString();
         
         try {
             console.info(`    [verifyPhaseCompliance] Checking if phase '${phase}' has standards defined...`);
-            const hasStandards = await this._checkPhaseHasStandards(ctx, phase);
+            const hasStandards = await this._checkPhaseHasStandards(ctx, phase, chaincodeName);
             
             if (!hasStandards) {
                 const message = `No standards defined for phase '${phase}'.`;
@@ -73,7 +73,7 @@ class QualityAssuranceContract extends Contract {
             const productPhaseData = await this._getProductDataForPhase(ctx, productType, productId, phase);
             
             console.info(`    [verifyPhaseCompliance] Getting standards for phase '${phase}'...`);
-            const standards = await this._getStandards(ctx, phase);
+            const standards = await this._getStandards(ctx, phase, chaincodeName);
             
             console.info(`    [verifyPhaseCompliance] Checking compliance...`);
             const { compliant, violations } = await this._checkCompliance(productPhaseData, standards);
@@ -96,10 +96,10 @@ class QualityAssuranceContract extends Contract {
         }
     }
 
-    async _checkPhaseHasStandards(ctx, phase) {
+    async _checkPhaseHasStandards(ctx, phase, chaincodeName) {
         console.info(`      [_checkPhaseHasStandards] Checking if standards exist for phase '${phase}'`);
         try {
-            const response = await ctx.stub.invokeChaincode('standardhoney', ['getStandards'], 'mychannel');
+            const response = await ctx.stub.invokeChaincode(chaincodeName, ['getStandards'], 'mychannel');
             const standards = JSON.parse(response.payload.toString());
 
             // check if phase exists and has parameters
@@ -135,10 +135,10 @@ class QualityAssuranceContract extends Contract {
         return aggregatedData;
     }
     
-    async _getStandards(ctx, phase) {
-        console.info(`      [_getStandards] Invoking StandardHoneyContract:getPhaseStandard for phase '${phase}'`);
+    async _getStandards(ctx, phase, chaincodeName) {
+        console.info(`      [_getStandards] Invoking Standards Contract:getPhaseStandard for phase '${phase}'`);
         try {
-            const response = await ctx.stub.invokeChaincode('standardhoney', ['getPhaseStandard', phase], 'mychannel');
+            const response = await ctx.stub.invokeChaincode(chaincodeName, ['getPhaseStandard', phase], 'mychannel');
             const standards = JSON.parse(response.payload.toString());
             console.info(`      [_getStandards] Standards for phase '${phase}' retrieved successfully.`);
             return standards;
@@ -253,11 +253,11 @@ class QualityAssuranceContract extends Contract {
         const vc = {
             '@context': [
                 'https://www.w3.org/2018/credentials/v1',
-                'https://example.com/honey-credentials/v1'
+                `https://example.com/${productType}-credentials/v1`
             ],
             id: credentialId,
-            type: ['VerifiableCredential', 'HoneyQualityCredential'],
-            
+            type: ['VerifiableCredential', 'QualityAssuranceCredential'],
+
             issuer: {
                 id: issuerId,
                 name: 'Quality Assurance System'
@@ -268,7 +268,7 @@ class QualityAssuranceContract extends Contract {
             
             credentialSubject: {
                 id: `product:${productType}:${productId}`,
-                type: 'HoneyProduct',
+                type: 'QualityAssuranceProduct',
                 productType: productType,
                 productId: productId,
                 phase: phase,
@@ -282,14 +282,14 @@ class QualityAssuranceContract extends Contract {
                 proofPurpose: 'assertionMethod',
                 verificationMethod: `${issuerId}#key-1`,
                 proofValue: `urn:blockchain:tx:${txId}`,
-                domain: 'honey-supply-chain'
+                domain: 'product-supply-chain'
             }
         };
 
         console.info(`      [${methodName}] VC structure built successfully`);
 
         console.info(`      [${methodName}] Creating composite key for ledger storage...`);
-        const vcKey = ctx.stub.createCompositeKey('vc.honey.quality', [productType, productId, phase]);
+        const vcKey = ctx.stub.createCompositeKey(`vc.product.quality`, [productType, productId, phase]);
         console.info(`      [${methodName}] Composite key created: ${vcKey}`);
 
         console.info(`      [${methodName}] Checking if credential already exists...`);
