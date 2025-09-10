@@ -7,7 +7,7 @@ const { Contract } = require('fabric-contract-api');
 
 class StandardHoneyContract extends Contract {
     constructor() {
-        super('utm.StandardHoneyContract');
+        super('tsp.StandardHoneyContract');
     }
 
     /**
@@ -48,7 +48,6 @@ class StandardHoneyContract extends Contract {
             throw new Error('Invalid JSON format for standards');
         }
         
-        // Basic validation
         if (!standards.productType || standards.productType !== 'honey') {
             throw new Error('Invalid product type. Only "honey" is supported');
         }

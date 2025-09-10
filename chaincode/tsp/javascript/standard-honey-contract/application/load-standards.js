@@ -19,7 +19,6 @@ const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUserHoneyStandard';
 
 function prettyJSONString(inputString) {
-    // Adiciona uma verificação para evitar erro se a entrada já for um objeto
     const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
     return JSON.stringify(obj, null, 2);
 }
@@ -45,7 +44,6 @@ async function main() {
         const contract = network.getContract(chaincodeName);
 
         console.log('\n--> Submitting transaction: initLedger');
-        // A resposta de initLedger geralmente é um status, não um JSON complexo
         await contract.submitTransaction('initLedger');
         console.log('--> "initLedger" transaction has been submitted successfully.');
 

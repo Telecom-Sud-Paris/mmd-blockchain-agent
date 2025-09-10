@@ -67,7 +67,7 @@ class ProductContract extends Contract {
         await ctx.stub.putState(compositeKey, finalPropertyBuffer);
         console.info('Property successfully saved to ledger.');
 
-        // Invoke AlertControlContract to check for alerts
+        // Invoke AlertControlContract to check for alert rules
         try {
             console.info('Invoking AlertControlContract to check for alerts...');
             const alertResponse = await ctx.stub.invokeChaincode(

@@ -8,7 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 
 class QualityAssuranceContract extends Contract {
     constructor() {
-        super('utm.QualityAssuranceContract');
+        super('tsp.QualityAssuranceContract');
     }
 
     async verifyProductCompliance(ctx, productType, productId, chaincodeName) {

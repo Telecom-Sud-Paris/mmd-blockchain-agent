@@ -57,7 +57,7 @@ async function main() {
                 'verifyProductCompliance',
                 productTypeToVerify,
                 productIdToVerify,
-                'standardhoney'  // Name of the Standards chaincode to invoke
+                'standardhoney'  // name for the chaincode for when it was deployed
             );
             
             const results = JSON.parse(resultBuffer.toString());
