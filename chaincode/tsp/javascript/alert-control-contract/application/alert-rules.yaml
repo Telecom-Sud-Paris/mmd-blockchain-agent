@@ -1,4 +1,4 @@
-- productId: 'fish'
+- productType: 'fish'
   rules:
     - propertyName: 'temperature'
       # Fish must be kept refrigerated during transport.
@@ -34,7 +34,7 @@
 
 
 
-- productId: 'tomato'
+- productType: 'tomato'
   rules:
     - propertyName: 'temperature'
       condition: 'greater_than'
@@ -61,7 +61,7 @@
       value: 0
       alertMessage: 'ALERT: Container door was opened during tomato transport!'
 
-- productId: 'honey'
+- productType: 'honey'
   rules:
     - propertyName: 'temperature'
       condition: 'less_than'

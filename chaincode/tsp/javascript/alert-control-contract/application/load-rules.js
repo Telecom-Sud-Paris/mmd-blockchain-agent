@@ -51,12 +51,12 @@ async function main() {
         const data = yaml.load(fileContents);
 
         for (const product of data) {
-            const productId = product.productId;
+            const productType = product.productType;
             for (const rule of product.rules) {
-                console.log(`\n--> Submitting transaction to set rule for product: ${productId}, property: ${rule.propertyName}`);
+                console.log(`\n--> Submitting transaction to set rule for product: ${productType}, property: ${rule.propertyName}`);
                 await contract.submitTransaction(
                     'setRule',
-                    productId,
+                    productType,
                     rule.propertyName,
                     rule.condition,
                     String(rule.value), 
