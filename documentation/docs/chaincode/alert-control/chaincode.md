@@ -29,7 +29,7 @@ module.exports = AlertControlContract;
 
 ## Contract Functions
 
-### Managing Functions
+### Write Functions
 
 #### `async setRule(...)`
 

@@ -8,6 +8,8 @@ sidebar_position: 1
 
 This section provides comprehensive documentation for all chaincodes in the More Med Diet blockchain project. Each chaincode serves a specific purpose in the supply chain and quality assurance process.
 
+`(...)/mmd-blockchain-agent/chaincode/tsp/javascript`
+
 ## Chaincode Installation and Packaging
 
 To deploy and run our smart contracts locally, use the following commands for each contract.
