@@ -1,7 +1,10 @@
+./network.sh deployCC -ccn alertcontrol -ccp ../chaincode/tsp/javascript/alert-control-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
+
 ./network.sh deployCC -ccn product -ccp ../chaincode/tsp/javascript/product-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 
-./network.sh deployCC -ccn qualitycontrol -ccp ../chaincode/tsp/javascript/quality-control-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
+./network.sh deployCC -ccn standardhoney -ccp ../chaincode/tsp/javascript/standard-honey-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 
+./network.sh deployCC -ccn qualityassurance -ccp ../chaincode/tsp/javascript/quality-assurance-contract/chaincode -ccv 1.0 -ccl javascript -ccs 1
 
 export PATH=${PWD}/../bin:$PATH
 

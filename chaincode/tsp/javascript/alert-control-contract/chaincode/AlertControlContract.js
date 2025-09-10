@@ -24,12 +24,28 @@ class AlertControlContract extends Contract {
     async setRule(ctx, productId, propertyName, condition, value, alertMessage) {
         console.log(`Setting rule for ${productId} - ${propertyName}`);
 
+        // Validate input
+        if (!productId || !propertyName || !condition || !value || !alertMessage) {
+            throw new Error('All parameters are required');
+        }
+
+        const supportedConditions = ['equal', 'not_equal', 'less_than', 'greater_than', 
+                                'less_than_or_equal', 'greater_than_or_equal'];
+        if (!supportedConditions.includes(condition)) {
+            throw new Error(`Unsupported condition: ${condition}`);
+        }
+
+        const numericValue = parseFloat(value);
+        if (isNaN(numericValue)) {
+            throw new Error(`Value must be numeric: ${value}`);
+        }
+
         const rule = {
             docType: 'alertRule',
             productId,
             propertyName,
             condition,
-            value: parseFloat(value), // Store as a number for easier comparisons
+            value: numericValue, // Store as a number for easier comparisons
             alertMessage
         };
 
@@ -133,32 +149,36 @@ class AlertControlContract extends Contract {
             return 'INVALID_VALUE';
         }
 
-        let violation = false;
+        let isRuleViolated = false;
         switch (rule.condition) {
             case 'equal':
-                violation = numericCurrentValue !== rule.value;
+                // Rule: value should be equal to rule.value
+                // Violation: when not equal
+                isRuleViolated = numericCurrentValue !== rule.value;
                 break;
             case 'not_equal':
-                violation = numericCurrentValue === rule.value;
+                // Rule: value should not be equal to rule.value
+                // Violation: when equal
+                isRuleViolated = numericCurrentValue === rule.value;
                 break;
-            case 'less_than':
-                violation = numericCurrentValue >= rule.value;
+                case 'less_than':
+                isRuleViolated = numericCurrentValue >= rule.value;
                 break;
-            case 'greater_than':
-                violation = numericCurrentValue <= rule.value;
+                case 'greater_than':
+                isRuleViolated = numericCurrentValue <= rule.value;
                 break;
-            case 'less_than_or_equal':
-                violation = numericCurrentValue > rule.value;
+                case 'less_than_or_equal':
+                isRuleViolated = numericCurrentValue > rule.value;
                 break;
-            case 'greater_than_or_equal':
-                violation = numericCurrentValue < rule.value;
+                case 'greater_than_or_equal':
+                isRuleViolated = numericCurrentValue < rule.value;
                 break;
-            default:
-                console.log(`Unknown condition: ${rule.condition}. Skipping check.`);
-                return 'UNKNOWN_CONDITION';
-        }
+                default:
+                    console.log(`Unknown condition: ${rule.condition}. Skipping check.`);
+                    return 'UNKNOWN_CONDITION';
+            }
 
-        if (violation) {
+        if (isRuleViolated) {
             console.error(`Rule violation detected for ${productId} - ${propertyName}!`);
             const alertPayload = {
                 productId: productId,
@@ -168,7 +188,6 @@ class AlertControlContract extends Contract {
                 timestamp: new Date(ctx.stub.getTxTimestamp().seconds.low * 1000).toISOString()
             };
 
-            // Emits an alert event for off-chain applications
             ctx.stub.setEvent('Alert', Buffer.from(JSON.stringify(alertPayload)));
             console.error(`Alert: ${rule.alertMessage}`);
             return rule.alertMessage;

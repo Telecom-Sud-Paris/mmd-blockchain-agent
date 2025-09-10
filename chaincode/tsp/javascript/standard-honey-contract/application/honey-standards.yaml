@@ -1,0 +1,71 @@
+productType: 'honey'
+version: '1.0.0'
+phases:
+  transportation:
+    temperature: 
+      max: 40 
+      unit: '°C'
+    humidity: 
+      max: 60 
+      unit: '%'
+      
+  beekeeping:
+    pesticide_level: 
+      max: 0.01 
+      unit: 'mg/kg'
+    hive_health_score: 
+      min: 80 
+      max: 100 
+      unit: 'score'
+
+  processing:
+    moisture_content: 
+      max: 20 
+      unit: '%'
+    temperature: 
+      max: 40 
+      unit: '°C'
+    filtration_quality: 
+      required: true
+
+  distribution:
+    storage_temperature: 
+      min: 10 
+      max: 25 
+      unit: '°C'
+    humidity: 
+      max: 60 
+      unit: '%'
+    origin_verification: 
+      required: true
+
+  retailing:
+    packaging_integrity: 
+      required: true
+    storage_temperature: 
+      min: 10 
+      max: 25 
+      unit: '°C'
+    origin_verification: 
+      required: true
+
+  final_product:
+    moisture_content: 
+      max: 20 
+      unit: '%'
+    fructose_content: 
+      min: 30 
+      max: 50 
+      unit: '%'
+    glucose_content: 
+      min: 25 
+      max: 45 
+      unit: '%'
+    sucrose_content: 
+      max: 5 
+      unit: '%'
+    microbial_count: 
+      max: 1000 
+      unit: 'CFU/g'
+    origin_verification: 
+      required: true

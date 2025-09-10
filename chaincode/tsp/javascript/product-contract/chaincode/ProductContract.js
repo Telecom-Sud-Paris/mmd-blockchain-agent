@@ -6,272 +6,193 @@
 
 const { Contract } = require('fabric-contract-api');
 
-/**
- * ProductContract
- *
- * A smart contract that manages properties associated with products in a supply chain.
- * It allows different publishers (such as transporters or food producers),
- * to register and update data (properties) about products, like temperature, location, etc.
- *
- * Each property is uniquely identified by the combination of:
- * - Product ID
- * - Property Name
- * - Publisher ID
- */
 class ProductContract extends Contract {
     constructor() {
-        // define unique namespace for this contract to avoid conflicts
         super('tsp.ProductContract');
     }
     
     async initLedger(ctx) {
-        console.log('============= START : Initialize Ledger ===========');
-        console.log('============= END : Initialize Ledger ===========');
-    }
-
-
-    // managing functions
-
-    /**
-    * @dev Creates a new product property or updates it if it already exists for a specific publisher.
-    * @param {Context} ctx The transaction context.
-    * @param {string} publisherId The ID of the entity publishing the property (e.g., 'Transporter').
-    * @param {string} productId The ID of the product the property refers to (e.g., 'fish').
-    * @param {string} propertyName The name of the property (e.g., 'temperature').
-    * @param {string} propertyValue The new or initial value for the property (e.g., '16.5').
-    * @returns {string} The created or updated property object in JSON format.
-    */
-    async upsertProductProperty(ctx, publisherId, productId, propertyName, propertyValue) {
-        console.log('============= START : upsertProductProperty ===========');
-
-        if (!publisherId || !productId || !propertyName || !propertyValue) {
-            throw new Error('publisherId, productId, propertyName, and propertyValue cannot be empty.');
-        }
-        // uniquely identifies the property for a specific product and publisher
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
-        const txTimestamp = ctx.stub.getTxTimestamp();
-        const date = new Date(txTimestamp.seconds.low * 1000 + txTimestamp.nanos / 1000000);
-        const timestamp = date.toISOString();
-
-        const existingPropertyBuffer = await ctx.stub.getState(compositeKey);
-
-        let finalProperty;
-        let eventName;
-
-        if (existingPropertyBuffer && existingPropertyBuffer.length > 0) {
-            console.log(`Property found for key ${compositeKey}. Updating...`);
-            const existingProperty = JSON.parse(existingPropertyBuffer.toString('utf8'));
-            // Update the value and timestamp
-            existingProperty.propertyValue = propertyValue;
-            existingProperty.lastUpdated = timestamp;
-            finalProperty = existingProperty;
-            eventName = 'PropertyUpdated'; // Set event for an update
-        } else {
-            console.log(`Property not found for key ${compositeKey}. Creating new one...`);
-            const newProperty = {
-                docType: 'productProperty',
-                publisherId: publisherId,
-                productId: productId,
-                propertyName: propertyName,
-                propertyValue: propertyValue,
-                lastUpdated: timestamp,
-            };
-            finalProperty = newProperty;
-            eventName = 'PropertyCreated'; // Set event for a creation
-        }
-
-        const finalPropertyBuffer = Buffer.from(JSON.stringify(finalProperty));
-        await ctx.stub.putState(compositeKey, finalPropertyBuffer);
-
-        const eventPayload = Buffer.from(JSON.stringify(finalProperty));
-        ctx.stub.setEvent(eventName, eventPayload);
-
-        console.log(`Upsert successful for: ${JSON.stringify(finalProperty)}`); 
-        console.log('============= END : upsertProductProperty ===========');
-
-        return JSON.stringify(finalProperty);
-    }
-
-
-    /**
-     * @dev Deletes a product property from the ledger.
-     * @param {Context} ctx The transaction context.
-     * @param {string} publisherId The ID of the property's publisher.
-     * @param {string} productId The product's ID.
-     * @param {string} propertyName The name of the property.
-     */
-    async deleteProductProperty(ctx, publisherId, productId, propertyName) {
-        console.log('============= START : deleteProductProperty ===========');
-
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
-        const propertyExists = await ctx.stub.getState(compositeKey);
-
-        if (!propertyExists || propertyExists.length === 0) {
-            throw new Error(`The property ${propertyName} for product ${productId} from publisher ${publisherId} was not found.`);
-        }
-
-        await ctx.stub.deleteState(compositeKey);
-        
-        const eventPayload = Buffer.from(JSON.stringify({ publisherId, productId, propertyName, status: 'deleted' }));
-        ctx.stub.setEvent('PropertyDeleted', eventPayload);
-
-        console.log(`Property deleted successfully: ${compositeKey}`);
-        console.log('============= END : deleteProductProperty ===========');
-    }
-
-
-
-    // Queries
-
-    /**
-     * @dev Queries all properties associated with a specific product ID.
-     * Uses a partial composite key to find all records for the product.
-     * @param {Context} ctx The transaction context.
-     * @param {string} productId The ID of the product to be queried.
-     * @returns {string} A JSON object containing the all the products and their properties.
-     * If no properties are found, returns an empty array.
-     * @throws {Error} If the productId is not provided.
-     * @throws {Error} If no properties are found for the given productId.
-     */
-
-    async queryAllProducts(ctx) {
-        console.log('============= START : queryAllProducts ===========');
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', []);
-        const products = new Map();
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const propertyRecord = JSON.parse(result.value.value.toString('utf8'));
-                    const productId = propertyRecord.productId;
-                    if (!products.has(productId)) {
-                        products.set(productId, {
-                            productId: productId,
-                            properties: []
-                        });
-                    }
-                    products.get(productId).properties.push(propertyRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from property record:', err);
-                }
+        console.info('============= START : Initialize Ledger ===========');
+        const products = [
+            {
+                productType: 'honey',
+                productId: 'honey-001',
+                properties: [
+                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'pesticide_level', propertyValue: '0.005' },
+                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'hive_health_score', propertyValue: '90' },
+                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'temperature', propertyValue: '20.5' },
+                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'humidity', propertyValue: '50' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'moisture_content', propertyValue: '21' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'temperature', propertyValue: '30' },
+                    { publisherId: 'Processor', phase: 'processing', propertyName: 'filtration_quality', propertyValue: 'true' },
+                ]
             }
-            result = await resultsIterator.next();
+        ];
+
+        for (const product of products) {
+            for (const property of product.properties) {
+                console.info(`  -> Initializing property: ${product.productId} / ${property.phase} / ${property.propertyName}`);
+                await this.upsertProductProperty(ctx, product.productType, product.productId, property.phase, property.propertyName, property.publisherId, property.propertyValue);
+            }
         }
-        await resultsIterator.close();
-        if (products.size === 0) {
-            console.warn('No products found in the ledger.');
+        console.info('============= END : Initialize Ledger ===========');
+    }
+
+    async upsertProductProperty(ctx, productType, productId, phase, propertyName, publisherId, propertyValue) {
+        console.info('============= START : upsertProductProperty ===========');
+        console.info(`Executing with args: ${productType}, ${productId}, ${phase}, ${propertyName}, ${publisherId}, ${propertyValue}`);
+
+        if (!productType || !publisherId || !productId || !phase || !propertyName || !propertyValue) {
+            throw new Error('productType, publisherId, productId, phase, propertyName, and propertyValue cannot be empty.');
         }
-        const response = Array.from(products.values());
-        console.log('============= END : queryAllProducts ===========');
-        return JSON.stringify(response);
+      
+        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productType, productId, phase, propertyName, publisherId]);
+        console.info(`Generated CompositeKey: ${compositeKey}`);
+
+        const txTimestamp = ctx.stub.getTxTimestamp();
+        const timestamp = new Date(txTimestamp.seconds.low * 1000).toISOString();
+
+        const newProperty = {
+            docType: 'productProperty',
+            productType,
+            productId,
+            phase,
+            propertyName,
+            publisherId,
+            propertyValue,
+            lastUpdated: timestamp,
+        };
+
+        const finalPropertyBuffer = Buffer.from(JSON.stringify(newProperty));
+        await ctx.stub.putState(compositeKey, finalPropertyBuffer);
+        console.info('Property successfully saved to ledger.');
+
+        // Invoke AlertControlContract to check for alert rules
+        try {
+            console.info('Invoking AlertControlContract to check for alerts...');
+            const alertResponse = await ctx.stub.invokeChaincode(
+                'alertcontrol', 
+                ['checkAlertRule', productType, propertyName, propertyValue], 
+                'mychannel'
+            );
+            
+            if (alertResponse.status === 200) {
+                const alertResult = alertResponse.payload.toString();
+                console.info(`Alert check result: ${alertResult}`);
+                
+                if (alertResult !== 'OK' && alertResult !== 'NO_RULE' && alertResult !== 'INVALID_VALUE' && alertResult !== 'UNKNOWN_CONDITION') {
+                    console.warn(`ALERT DETECTED: ${alertResult}`);
+                }
+            } else {
+                console.error(`Failed to invoke AlertControlContract: ${alertResponse.message}`);
+            }
+        } catch (error) {
+            console.error(`Error invoking AlertControlContract: ${error.message}`);
+        }
+
+        const eventPayload = Buffer.from(JSON.stringify(newProperty));
+        ctx.stub.setEvent('PropertyUpserted', eventPayload);
+        console.info('Event "PropertyUpserted" emitted.');
+
+        console.info(`Upsert successful for: ${JSON.stringify(newProperty)}`); 
+        console.info('============= END : upsertProductProperty ===========');
+
+        return JSON.stringify(newProperty);
     }
     
-    /**     
-     * * @dev Queries all properties associated with a specific product ID.
-     * Uses a partial composite key to find all records for the product.
-     * @param {Context} ctx The transaction context
-     * @param {string} productId The ID of the product to be queried.
-     * @returns {string} A JSON object containing the product ID and its properties.
-     */
+    async queryProductProperties(ctx, productType, productId) {
+        console.info('============= START : queryProductProperties ===========');
+        console.info(`Querying for productType: ${productType}, productId: ${productId}`);
 
-    async queryProductProperties(ctx, productId) {
-        console.log('============= START : queryProductProperties ===========');
-
-        if (!productId) {
-            throw new Error('The product ID is required for the query.');
+        if (!productType || !productId) {
+            throw new Error('The productType and productId are required for the query.');
         }
 
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productId]);
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType, productId]);
         const properties = [];
         
         let result = await resultsIterator.next();
         while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const propertyRecord = JSON.parse(result.value.value.toString('utf8'));
-                    properties.push(propertyRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from property record:', err);
-                }
+            if (result.value && result.value.value.toString()) {
+                properties.push(JSON.parse(result.value.value.toString('utf8')));
             }
             result = await resultsIterator.next();
         }
         await resultsIterator.close();
 
-        if (properties.length === 0) {
-            console.warn(`No properties found for product with ID=${productId}`);
-        }
-        
+        console.info(`Found ${properties.length} properties for this product.`);
+
         const response = {
-            productId: productId,
-            properties: properties
+            productType,
+            productId,
+            properties
         };
 
-        console.log('============= END : queryProductProperties ===========');
+        console.info('Query successful. Returning response.');
+        console.info('============= END : queryProductProperties ===========');
+        return JSON.stringify(response);
+    }
+    
+    async queryProductByPhase(ctx, productType, productId, phase) { 
+        console.info('============= START : queryProductByPhase ===========');
+        console.info(`Querying for productType: ${productType}, productId: ${productId}, phase: ${phase}`);
+
+        if (!productType || !productId || !phase) {
+            throw new Error('productType, productId, and phase are required for the query.');
+        }
+
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType, productId, phase]);
+        const properties = [];
+        
+        let result = await resultsIterator.next();
+        while (!result.done) {
+            if (result.value && result.value.value.toString()) {
+                properties.push(JSON.parse(result.value.value.toString('utf8')));
+            }
+            result = await resultsIterator.next();
+        }
+        await resultsIterator.close();
+        console.info(`Found ${properties.length} properties for this product in phase '${phase}'.`);
+        
+        const response = {
+            productType,
+            productId,
+            phase,
+            properties
+        };
+        
+        console.info('Query successful. Returning response.');
+        console.info('============= END : queryProductByPhase ===========');
         return JSON.stringify(response);
     }
 
+;
 
-    // Util functions
-
-    /**
-     * @dev Retrieves the history of changes for a specific product property.
-     * @param {Context} ctx The transaction context.
-     * @param {string} publisherId The ID of the property's publisher.
-     * @param {string} productId The product's ID.
-     * @param {string} propertyName The name of the property.
-     * @returns {string} A JSON array of historical values for the property.
-     */
-    async getProductPropertyHistory(ctx, publisherId, productId, propertyName) {
-        console.log('============= START : getProductPropertyHistory ===========');
-
-        const compositeKey = ctx.stub.createCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
-        const resultsIterator = await ctx.stub.getHistoryForKey(compositeKey);
-
-        const history = [];
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value) {
-                const record = {
-                    txId: result.value.tx_id,
-                    timestamp: result.value.timestamp.toDate().toISOString(),
-                    isDelete: result.value.is_delete,
-                    value: result.value.value.toString('utf8'),
-                };
-                history.push(record);
+    async getProductByType(ctx, productType) {
+        console.log('============= START : getProductByType ===========');      
+        if (!productType) {
+            throw new Error('productType is required for the query.');
+        }
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productType]);
+        const products = [];
+        for await (const res of resultsIterator) {
+            const product = JSON.parse(res.value.toString('utf8'));
+            if (!products.some(p => p.productId === product.productId)) {
+                products.push({
+                    productType: product.productType,
+                    productId: product.productId,
+                    properties: []
+                });
             }
-            result = await resultsIterator.next();
+            products.find(p => p.productId === product.productId).properties.push(product);
         }
-        await resultsIterator.close();
-
-        console.log('============= END : getProductPropertyHistory ===========');
-        return JSON.stringify(history);
+        if (products.length === 0) {
+            console.warn(`No products found for productType=${productType}`);
+        }
+        console.log('============= END : getProductByType ===========');
+        return JSON.stringify(products);
     }
-
-    /**
-     * @dev Checks if a property name exists for a given product (regardless of publisher).
-     * @param {Context} ctx The transaction context.
-     * @param {string} productId The product's ID.
-     * @param {string} propertyName The name of the property to check.
-     * @returns {boolean} True if the property exists for the product, false otherwise.
-     */
-    async propertyNameExistsForProduct(ctx, productId, propertyName, publisherId) {
-        if (!productId || !propertyName || !publisherId) {
-            throw new Error('productId, propertyName and publisherId are required.');
-        }
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('ProductProperty', [productId, propertyName, publisherId]);
-        let exists = false;
-        let result = await resultsIterator.next();
-        while (!result.done) {
-            if (result.value && result.value.value && result.value.value.length > 0) {
-                exists = true;
-                break;
-            }
-            result = await resultsIterator.next();
-        }
-        await resultsIterator.close();
-        return exists;
-    }
+    
 }
 
 module.exports = ProductContract;

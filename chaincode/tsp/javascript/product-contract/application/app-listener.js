@@ -19,7 +19,8 @@ const walletPath = path.join(__dirname, 'wallet');
 const org1UserId = 'appUserListener';
 
 // =========== config MQTT ===========
-const brokerUrl = 'mqtt://172.17.0.1:1883'; //gateway 1
+//const brokerUrl = 'mqtt://172.17.0.1:1883'; //gateway 1
+const brokerUrl = 'mqtt://172.17.0.1:1884'; //gateway 2
 const topic = '#'; //listen to all topics
 
 function prettyJSONString(inputString) {
@@ -103,8 +104,10 @@ async function main() {
                 'upsertProductProperty',
                 data.publisherId,
                 data.productId,
+                'testing', // assuming 'testing' phase for this example since nodered isnt passing phases yet
                 propertyName,
-                String(data.value)
+                String(data.value),
+                
             );
             console.log(`*** Transaction committed successfully!`);
             console.log(`*** Result: ${prettyJSONString(commit.toString())}`);
