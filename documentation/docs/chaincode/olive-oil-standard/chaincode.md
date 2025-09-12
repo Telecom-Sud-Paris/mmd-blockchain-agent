@@ -40,7 +40,7 @@ Purpose: Sets or completely replaces the quality standards on the ledger.
 * **Core Logic**
     1. Parses the input standardsJSON string.
     2. Validates the object to ensure it has a productType of 'olive-oil', a valid semantic version (e.g., '1.0.0'), and a phases object.
-    3. It also validates that the phase names are from a predefined list (transportation, beekeeping, etc.).
+    3. It also validates that the phase names are from a predefined list (cultivation, harvesting, etc.).
     4. Adds a lastUpdated timestamp based on the transaction time.
     5. Saves the complete standards object to the ledger, overwriting any previous version.
 
