@@ -15,3 +15,9 @@ Run the auxiliar js file for honey QA.
 ```bash
 node honey-qa.js
 ```
+
+Run the auxiliar js file for olive oil QA.
+
+```bash
+node olive-oil-qa.js
+```

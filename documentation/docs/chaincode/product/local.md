@@ -15,3 +15,4 @@ Init the ledger with some products.
 ```bash
 node init-product.js
 ```
+

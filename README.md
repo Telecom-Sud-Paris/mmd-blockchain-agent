@@ -23,3 +23,10 @@ Start network by running `./startFabric.sh`
 
 Bring network down by running `./networkDown.sh`
 
+## Documentation
+
+To run the documentation website locally, do the following.
+
+1. cd documentation
+2. nvm use 18
+3. npm start

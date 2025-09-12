@@ -15,18 +15,18 @@ class ProductContract extends Contract {
         console.info('============= START : Initialize Ledger ===========');
         const products = [
             {
-                productType: 'honey',
-                productId: 'honey-001',
-                properties: [
-                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'pesticide_level', propertyValue: '0.005' },
-                    { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'hive_health_score', propertyValue: '90' },
-                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'temperature', propertyValue: '20.5' },
-                    { publisherId: 'Transporter', phase: 'transportation', propertyName: 'humidity', propertyValue: '50' },
-                    { publisherId: 'Processor', phase: 'processing', propertyName: 'moisture_content', propertyValue: '21' },
-                    { publisherId: 'Processor', phase: 'processing', propertyName: 'temperature', propertyValue: '30' },
-                    { publisherId: 'Processor', phase: 'processing', propertyName: 'filtration_quality', propertyValue: 'true' },
+            productType: 'honey',
+            productId: 'honey-001',
+            properties: [
+                { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'pesticide_level', propertyValue: '0.005' },
+                { publisherId: 'Farmer', phase: 'beekeeping', propertyName: 'hive_health_score', propertyValue: '90' },
+                { publisherId: 'Transporter', phase: 'transportation', propertyName: 'temperature', propertyValue: '20.5' },
+                { publisherId: 'Transporter', phase: 'transportation', propertyName: 'humidity', propertyValue: '50' },
+                { publisherId: 'Processor', phase: 'processing', propertyName: 'moisture_content', propertyValue: '21' },
+                { publisherId: 'Processor', phase: 'processing', propertyName: 'temperature', propertyValue: '30' },
+                { publisherId: 'Processor', phase: 'processing', propertyName: 'filtration_quality', propertyValue: 'true' },
                 ]
-            }
+            },
         ];
 
         for (const product of products) {
