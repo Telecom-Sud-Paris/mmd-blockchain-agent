@@ -98,16 +98,16 @@ async function main() {
             if (!data.publisherId || !data.productId || !propertyName || data.value === undefined) {
                 throw new Error('Invalid message format. Missing publisherId, productId, propertyName, or value.');
             }
-
+            let randomId = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
             console.log('Submitting transaction to create or update property...');
             const commit = await productContract.submitTransaction(
                 'upsertProductProperty',
-                data.publisherId,
-                data.productId,
-                'testing', // assuming 'testing' phase for this example since nodered isnt passing phases yet
+                data.productId, //using productId as productType Since nodered isnt passing product types yet
+                `${data.productId}-${randomId}`, //using productId as productId with random suffix
+                'processing', // assuming 'processing' phase for this example since nodered isnt passing phases yet
                 propertyName,
-                String(data.value),
-                
+                data.publisherId,
+                String(data.value)
             );
             console.log(`*** Transaction committed successfully!`);
             console.log(`*** Result: ${prettyJSONString(commit.toString())}`);

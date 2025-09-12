@@ -10,6 +10,7 @@ const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js'); 
 const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js'); 
+const { disconnect } = require('process');
 
 // =========== config FABRIC ===========
 const channelName = 'mychannel';
@@ -50,10 +51,15 @@ async function main() {
         
         console.log('Fabric connection successful. Contract object is ready.');
 
-        const rules = await contract.submitTransaction('checkAlertRule',
-            'fish', 'temperature', 5);
+        const check = await contract.submitTransaction('checkAlertRule',
+            'honey', 'temperature', 35);
 
-        console.log(`*** Result: ${rules.toString()}`);
+        console.log(`*** Result: ${check.toString()}`);
+
+        const allRules = await contract.evaluateTransaction("queryAllRules");
+        console.log(`*** All Rules: ${prettyJSONString(allRules.toString())}`);
+
+        
 
     } catch (error) {
         console.error(`******** FAILED to connect to Fabric network: ${error}`);

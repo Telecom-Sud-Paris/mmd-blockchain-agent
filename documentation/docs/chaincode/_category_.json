@@ -1,0 +1,8 @@
+{
+  "label": "Chaincode",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Implementation details for Chaincodes."
+  }
+}

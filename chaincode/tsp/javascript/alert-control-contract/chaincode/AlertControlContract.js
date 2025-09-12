@@ -15,17 +15,17 @@ class AlertControlContract extends Contract {
      * @dev Stores or updates a quality rule on the ledger.
      * This function should be called by an administrator to configure the system.
      * @param {Context} ctx The transaction context.
-     * @param {string} productId The product ID (e.g., 'fish').
+     * @param {string} productType The product type (e.g., 'fish').
      * @param {string} propertyName The property name (e.g., 'temperature').
      * @param {string} condition The comparison condition ('equal', 'less_than', etc.).
      * @param {string} value The reference value for the rule.
      * @param {string} alertMessage The message to be emitted if the rule is violated.
      */
-    async setRule(ctx, productId, propertyName, condition, value, alertMessage) {
-        console.log(`Setting rule for ${productId} - ${propertyName}`);
+    async setRule(ctx, productType, propertyName, condition, value, alertMessage) {
+        console.log(`Setting rule for ${productType} - ${propertyName}`);
 
         // Validate input
-        if (!productId || !propertyName || !condition || !value || !alertMessage) {
+        if (!productType || !propertyName || !condition || !value || !alertMessage) {
             throw new Error('All parameters are required');
         }
 
@@ -42,102 +42,37 @@ class AlertControlContract extends Contract {
 
         const rule = {
             docType: 'alertRule',
-            productId,
+            productType,
             propertyName,
             condition,
             value: numericValue, // Store as a number for easier comparisons
             alertMessage
         };
 
-        // The rule's key is a combination of the product ID and property name
-        const ruleKey = ctx.stub.createCompositeKey('Rule', [productId, propertyName]);
+        // The rule's key is a combination of the product type and property name
+        const ruleKey = ctx.stub.createCompositeKey('Rule', [productType, propertyName]);
         await ctx.stub.putState(ruleKey, Buffer.from(JSON.stringify(rule)));
         
         console.log(`Rule set successfully for key: ${ruleKey}`);
     }
 
-    /**
-     * @dev Queries all quality rules for a specific product.
-     * @param {Context} ctx The transaction context.
-     * @param {string} productId The ID of the product to query rules for.
-     * @returns {string} A JSON string representing an array of rules for the specified product.
-     */
-    async queryRulesForProduct(ctx, productId) {
-        console.log(`Querying rules for product: ${productId}`);
-        
-        if (!productId) {
-            throw new Error('Product ID must be provided.');
-        }
-
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('Rule', [productId]);
-        
-        const productRules = [];
-        let result = await resultsIterator.next();
-        
-        while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const ruleRecord = JSON.parse(result.value.value.toString('utf8'));
-                    productRules.push(ruleRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from rule record:', err);
-                }
-            }
-            result = await resultsIterator.next();
-        }
-        
-        await resultsIterator.close();
-        
-        console.log(`Found ${productRules.length} rules for product ${productId}.`);
-        return JSON.stringify(productRules);
-    }
-
-    /**
-     * @dev Queries all quality rules registered on the ledger.
-     * @param {Context} ctx The transaction context.
-     * @returns {string} A JSON string representing an array of all rules.
-     */
-    async queryAllRules(ctx) {
-        console.log('Querying all quality rules...');
-        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('Rule', []);
-        
-        const allRules = [];
-        let result = await resultsIterator.next();
-        
-        while (!result.done) {
-            if (result.value && result.value.value) {
-                try {
-                    const ruleRecord = JSON.parse(result.value.value.toString('utf8'));
-                    allRules.push(ruleRecord);
-                } catch (err) {
-                    console.error('Error parsing JSON from rule record:', err);
-                }
-            }
-            result = await resultsIterator.next();
-        }
-        
-        await resultsIterator.close();
-        
-        console.log(`Found ${allRules.length} rules.`);
-        return JSON.stringify(allRules);
-    }
 
     /**
      * @dev Main verification function
      * @param {Context} ctx The transaction context.
-     * @param {string} productId The product ID.
+     * @param {string} productType The product type.
      * @param {string} propertyName The property name.
      * @param {string} currentValue The current value of the property.
      * @returns {string} Returns 'OK' if quality standards are met or AlertMessage if they are violated.
      */
-    async checkAlertRule(ctx, productId, propertyName, currentValue) {
-        console.log(`Checking alert for ${productId} - ${propertyName} with value ${currentValue}`);
+    async checkAlertRule(ctx, productType, propertyName, currentValue) {
+        console.log(`Checking alert for ${productType} - ${propertyName} with value ${currentValue}`);
 
-        const ruleKey = ctx.stub.createCompositeKey('Rule', [productId, propertyName]);
+        const ruleKey = ctx.stub.createCompositeKey('Rule', [productType, propertyName]);
         const ruleJSON = await ctx.stub.getState(ruleKey);
 
         if (!ruleJSON || ruleJSON.length === 0) {
-            console.log(`No alert rule found for ${productId} - ${propertyName}. Skipping check.`);
+            console.log(`No alert rule found for ${productType} - ${propertyName}. Skipping check.`);
             return 'NO_RULE';
         }
 
@@ -179,16 +114,15 @@ class AlertControlContract extends Contract {
             }
 
         if (isRuleViolated) {
-            console.error(`Rule violation detected for ${productId} - ${propertyName}!`);
+            console.error(`Rule violation detected for ${productType} - ${propertyName}!`);
             const alertPayload = {
-                productId: productId,
+                productType: productType,
                 propertyName: propertyName,
                 checkedValue: numericCurrentValue,
                 rule: rule,
                 timestamp: new Date(ctx.stub.getTxTimestamp().seconds.low * 1000).toISOString()
             };
 
-            // Emits an alert event for off-chain applications
             ctx.stub.setEvent('Alert', Buffer.from(JSON.stringify(alertPayload)));
             console.error(`Alert: ${rule.alertMessage}`);
             return rule.alertMessage;
@@ -197,6 +131,75 @@ class AlertControlContract extends Contract {
         console.log('Rule check passed.');
         return 'OK';
     }
+
+    
+    /**
+     * @dev Queries all quality rules for a specific product.
+     * @param {Context} ctx The transaction context.
+     * @param {string} productType The ID of the product to query rules for.
+     * @returns {string} A JSON string representing an array of rules for the specified product.
+     */
+    async queryRulesForProduct(ctx, productType) {
+        console.log(`Querying rules for product: ${productType}`);
+        
+        if (!productType) {
+            throw new Error('Product type must be provided.');
+        }
+
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('Rule', [productType]);
+        
+        const productRules = [];
+        let result = await resultsIterator.next();
+        
+        while (!result.done) {
+            if (result.value && result.value.value) {
+                try {
+                    const ruleRecord = JSON.parse(result.value.value.toString('utf8'));
+                    productRules.push(ruleRecord);
+                } catch (err) {
+                    console.error('Error parsing JSON from rule record:', err);
+                }
+            }
+            result = await resultsIterator.next();
+        }
+        
+        await resultsIterator.close();
+        
+        console.log(`Found ${productRules.length} rules for product ${productType}.`);
+        return JSON.stringify(productRules);
+    }
+
+    /**
+     * @dev Queries all quality rules registered on the ledger.
+     * @param {Context} ctx The transaction context.
+     * @returns {string} A JSON string representing an array of all rules.
+     */
+    async queryAllRules(ctx) {
+        console.log('Querying all quality rules...');
+        const resultsIterator = await ctx.stub.getStateByPartialCompositeKey('Rule', []);
+        
+        const allRules = [];
+        let result = await resultsIterator.next();
+        
+        while (!result.done) {
+            if (result.value && result.value.value) {
+                try {
+                    const ruleRecord = JSON.parse(result.value.value.toString('utf8'));
+                    allRules.push(ruleRecord);
+                } catch (err) {
+                    console.error('Error parsing JSON from rule record:', err);
+                }
+            }
+            result = await resultsIterator.next();
+        }
+        
+        await resultsIterator.close();
+        
+        console.log(`Found ${allRules.length} rules.`);
+        return JSON.stringify(allRules);
+    }
+
+    
 }
 
 module.exports = AlertControlContract;

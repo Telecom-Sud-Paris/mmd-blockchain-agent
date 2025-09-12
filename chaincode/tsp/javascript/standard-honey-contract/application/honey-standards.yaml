@@ -1,7 +1,7 @@
 productType: 'honey'
 version: '1.0.0'
 phases:
-  testing:
+  transportation:
     temperature: 
       max: 40 
       unit: '°C'
