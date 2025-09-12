@@ -1,0 +1,60 @@
+productType: 'olive-oil'
+version: '1.0.0'
+phases:
+  cultivation:
+    temperature: 
+      min: 10
+      max: 30 
+      unit: '°C'
+    humidity: 
+      max: 70 
+      unit: '%'
+    pesticide_level: 
+      max: 5 
+      unit: 'ppm'
+    irrigation_water_ph:
+      min: 6.5
+      max: 8.5
+    irrigation_water_lead:
+      max: 0.1
+      unit: 'mg/l'
+    irrigation_water_cadmium:
+      max: 0.01
+      unit: 'mg/l'
+      
+  harvesting:
+    delay_after_rain: 
+      min: 48 
+      unit: 'hours'
+    bruising: 
+      max: 2 
+      unit: '%'
+    harvest_method:
+      allowed: ['hand picking', 'mechanical shaker']
+      prohibited: ['ground collection']
+
+  extraction:
+    temperature: 
+      max: 27 
+      unit: '°C'
+    pressure: 
+      min: 200
+      max: 400 
+      unit: 'bar'
+      
+  storage:
+    temperature: 
+      min: 14 
+      max: 18 
+      unit: '°C'
+    packaging_material:
+      allowed: ['dark glass', 'stainless steel']
+      prohibited: ['clear plastic', 'non-food-grade metals']
+
+final_product:
+  acidity: 
+    max: 0.8 
+    unit: '%'
+  peroxide: 
+    max: 20 
+    unit: 'meqO2/kg'

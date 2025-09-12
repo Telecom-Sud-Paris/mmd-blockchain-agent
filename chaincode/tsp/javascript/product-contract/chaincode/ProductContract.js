@@ -27,6 +27,22 @@ class ProductContract extends Contract {
                 { publisherId: 'Processor', phase: 'processing', propertyName: 'filtration_quality', propertyValue: 'true' },
                 ]
             },
+            {
+            productType: 'olive-oil',
+            productId: 'olive-oil-001',
+            properties: [
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'temperature', propertyValue: '15' },
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'humidity', propertyValue: '60' },
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'pesticide_level', propertyValue: '4.5' },
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'irrigation_water_ph', propertyValue: '7.2' },
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'irrigation_water_lead', propertyValue: '0.05' },
+                { publisherId: 'Grower', phase: 'cultivation', propertyName: 'irrigation_water_cadmium', propertyValue: '0.005' },
+                { publisherId: 'Harvester', phase: 'harvesting', propertyName: 'bruising', propertyValue: '1.8' },
+                { publisherId: 'Mill', phase: 'extraction', propertyName: 'temperature', propertyValue: '26' },
+                { publisherId: 'Mill', phase: 'extraction', propertyName: 'pressure', propertyValue: '350' },
+                ]
+            }
+
         ];
 
         for (const product of products) {
