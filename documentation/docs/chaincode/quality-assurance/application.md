@@ -14,4 +14,10 @@ This Node.js script provides a simple way to initiate and review the quality ass
     2.  **Invoke**: Submits a single transaction to the `verifyProductCompliance` function on the `QualityAssuranceContract`. It specifies the product to check (`honey-001`) and the standards contract to use (`standardhoney`).
     3.  **Display Report**: Receives the JSON report from the chaincode, parses it, and prints a detailed, phase-by-phase summary to the console. The report clearly indicates if a phase was `APPROVED` (and shows the credential) or `REJECTED` (and lists the violations).
 
+
+## Olive Oil QA
+* **Workflow**:
+    1.  **Connect**: Establishes a connection to the Fabric network.
+    2.  **Invoke**: Submits a single transaction to the `verifyProductCompliance` function on the `QualityAssuranceContract`. It specifies the product to check (`olive-oil-001`) and the standards contract to use (`standardoliveoil`).
+    3.  **Display Report**: Receives the JSON report from the chaincode, parses it, and prints a detailed, phase-by-phase summary to the console. The report clearly indicates if a phase was `APPROVED` (and shows the credential) or `REJECTED` (and lists the violations).
 ---

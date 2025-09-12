@@ -54,10 +54,14 @@ async function main() {
         console.log('--> Transaction "initLedger" has been submitted');
         
         console.log('\n--> Evaluating transaction: queryProductProperties');
-        let response = await contract.evaluateTransaction('queryProductProperties', 'honey', 'honey-001');
-        console.log('--> Transaction "queryProductProperties" has been evaluated');
+        let honey = await contract.evaluateTransaction('queryProductProperties', 'honey', 'honey-001');
+        console.log(`\nhoney: ${prettyJSONString(honey.toString())}`);
+
+        console.log('\n--> Evaluating transaction: queryProductProperties');
+        let oliveoil = await contract.evaluateTransaction('queryProductProperties', 'olive-oil', 'olive-oil-001');
+        console.log(`\noliveoil: ${prettyJSONString(oliveoil.toString())}`);
         
-        console.log(`\nResponse: ${prettyJSONString(response.toString())}`);
+        
         
     } catch (error) {
         console.error(`\n******** FAILED to run application: ${error}`);
