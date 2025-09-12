@@ -1,8 +1,8 @@
 {
-  "label": "Alert Rules",
+  "label": "Alert Control",
   "position": 3,
   "link": {
     "type": "generated-index",
-    "description": "Implementation details for Alert Rules."
+    "description": "Implementation details for Alert Control rules."
   }
 }

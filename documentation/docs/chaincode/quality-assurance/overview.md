@@ -10,7 +10,7 @@ Upon successful verification of a product's supply chain phase, the contract iss
 
 The system is composed of two main components:
 * **`QualityAssuranceContract.js`**: The smart contract that contains the logic for auditing product data, comparing it against standards, and issuing credentials.
-* **`honey-qa.js`**: A client application script used to trigger the end-to-end compliance verification for a specific product and display a detailed report.
+* **`honey-qa.js`** and  **`olive-oil-qa.js`**: A client application script used to trigger the end-to-end compliance verification for a specific product and display a detailed report.
 
 ---
 

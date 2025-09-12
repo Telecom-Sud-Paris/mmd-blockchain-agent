@@ -72,3 +72,30 @@
       condition: 'less_than'
       value: 60
       alertMessage: 'ALERT: Ambient humidity for honey is over 60%.'
+
+    - propertyName: 'pesticide_level'
+      condition: 'less_than'
+      value: 0.01
+      alertMessage: 'ALERT: Pesticide level in honey exceeds the safe limit of 0.01 mg/kg!'
+
+- productType: 'olive-oil'
+  rules:
+    - propertyName: 'temperature'
+      condition: 'less_than'
+      value: 30
+      alertMessage: 'ALERT: Olive oil storage temperature has exceeded 30°C, risking degradation.'
+    
+    - propertyName: 'temperature'
+      condition: 'greater_than'
+      value: 10
+      alertMessage: 'ALERT: Olive oil storage temperature is below the optimal 10°C.'
+
+    - propertyName: 'humidity'
+      condition: 'less_than'
+      value: 70
+      alertMessage: 'ALERT: Ambient humidity for olive oil is over 70%.'
+
+    - propertyName: 'pesticide_level'
+      condition: 'less_than'
+      value: 5
+      alertMessage: 'ALERT: Pesticide level in olive oil exceeds the safe limit of 5 ppm!'

@@ -4,20 +4,19 @@
 
 'use strict';
 
-// =========== modules ===========
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
 const path = require('path');
+const fs = require('fs');
+const yaml = require('js-yaml');
 const { buildCAClient, registerAndEnrollUser, enrollAdmin } = require('../../../../../test-application/javascript/CAUtil.js'); 
 const { buildCCPOrg1, buildWallet } = require('../../../../../test-application/javascript/AppUtil.js'); 
 
-// =========== config FABRIC ===========
 const channelName = 'mychannel';
-const chaincodeName = 'product';
+const chaincodeName = 'standardoliveoil';
 const mspOrg1 = 'Org1MSP';
 const walletPath = path.join(__dirname, 'wallet');
-const org1UserId = 'testUser1';
-
+const org1UserId = 'appUserOliveOilStandard';
 
 function prettyJSONString(inputString) {
     const obj = typeof inputString === 'string' ? JSON.parse(inputString) : inputString;
@@ -26,18 +25,14 @@ function prettyJSONString(inputString) {
 
 async function main() {
     let gateway;
-
     try {
-        // Fabric network connection
-        console.log('Initializing Fabric connection...');
-
         const ccp = buildCCPOrg1();
         const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
         const wallet = await buildWallet(Wallets, walletPath);
-
+    
         await enrollAdmin(caClient, wallet, mspOrg1);
         await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
-
+    
         gateway = new Gateway();
         await gateway.connect(ccp, {
             wallet,
@@ -47,31 +42,28 @@ async function main() {
 
         const network = await gateway.getNetwork(channelName);
         const contract = network.getContract(chaincodeName);
-        console.log('Fabric connection successful. Contract object is ready.');
-        
+
         console.log('\n--> Submitting transaction: initLedger');
         await contract.submitTransaction('initLedger');
-        console.log('--> Transaction "initLedger" has been submitted');
-        
-        console.log('\n--> Evaluating transaction: queryProductProperties');
-        let honey = await contract.evaluateTransaction('queryProductProperties', 'honey', 'honey-001');
-        console.log(`\nhoney: ${prettyJSONString(honey.toString())}`);
+        console.log('--> "initLedger" transaction has been submitted successfully.');
 
-        console.log('\n--> Evaluating transaction: queryProductProperties');
-        let oliveoil = await contract.evaluateTransaction('queryProductProperties', 'olive-oil', 'olive-oil-001');
-        console.log(`\noliveoil: ${prettyJSONString(oliveoil.toString())}`);
+        console.log('\nLoading standards from olive-oil-standards.yaml...');
+        const fileContents = fs.readFileSync(path.join(__dirname, 'olive-oil-standards.yaml'), 'utf8');
+        const standards = yaml.load(fileContents);
         
+        console.log('\n--> Submitting transaction: setStandards');
+        const responseBuffer = await contract.submitTransaction(
+            'setStandards', 
+            JSON.stringify(standards)
+        );
         
-        
+        console.log('\nStandards successfully loaded. Response:');
+        console.log(prettyJSONString(responseBuffer.toString()));
+
     } catch (error) {
-        console.error(`\n******** FAILED to run application: ${error}`);
-        if (error.stack) {
-            console.error(error.stack);
-        }
-        process.exit(1); 
+        console.error('\nFailed to load standards:', error);
+        process.exit(1);
     } finally {
-        // --- disconnection ---
-        console.log('\nShutting down...');
         if (gateway) {
             gateway.disconnect();
         }
