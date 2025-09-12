@@ -14,6 +14,8 @@ This section provides comprehensive documentation for all chaincodes in the More
 
 To deploy and run our smart contracts locally, use the following commands for each contract.
 
+Make sure to be in the current folder: `mmd-blockchain-agent/test-network`
+
 ### General Command Syntax
 ```bash
 ./network.sh deployCC -ccn <package_name> 
@@ -55,6 +57,17 @@ Manages honey standardization and certification processes.
 ```bash
 ./network.sh deployCC -ccn standardhoney \
   -ccp ../chaincode/tsp/javascript/standard-honey-contract/chaincode \
+  -ccv 1.0 \
+  -ccl javascript \
+  -ccs 1
+```
+
+- Standard Olive Oil Contract
+Manages olive oil standardization and certification processes.
+
+```bash
+./network.sh deployCC -ccn standardoliveoil \
+  -ccp ../chaincode/tsp/javascript/standard-olive-oil-contract/chaincode \
   -ccv 1.0 \
   -ccl javascript \
   -ccs 1
